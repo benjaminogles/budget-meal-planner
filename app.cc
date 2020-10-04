@@ -14,22 +14,19 @@ namespace
     }
   }
 
-  QSqlDatabase choose_db(QString src)
+  bool init_db(QString src)
   {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     if (src.length())
       db.setDatabaseName(src);
     else
       db.setDatabaseName(":memory:");
-    return db;
+    return db.open();
   }
 }
 
 struct App::Impl
 {
-  Impl(QString dbsrc) : db(choose_db(dbsrc)) {}
-
-  QSqlDatabase db;
 };
 
 static App *_app = nullptr;
@@ -40,7 +37,7 @@ App* App::instance()
   return _app;
 }
 
-App::App(int &argc, char **argv) : QApplication(argc, argv)
+App::App(int &argc, char **argv) : QApplication(argc, argv), impl(std::make_unique<Impl>())
 {
   QString dbsrc;
   for (int i = 1; i < argc; i++)
@@ -52,9 +49,7 @@ App::App(int &argc, char **argv) : QApplication(argc, argv)
       dbsrc = argv[i + 1];
     }
   }
-
-  impl = std::make_unique<Impl>(dbsrc);
-
+  check_fatal(init_db(dbsrc), "Unable to connect to database");
   _app = this;
 }
 
