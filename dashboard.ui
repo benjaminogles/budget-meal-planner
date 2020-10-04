@@ -14,45 +14,182 @@
    <string>Dashboard</string>
   </property>
   <widget class="QWidget" name="top">
-   <widget class="QWidget" name="verticalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>-1</x>
-      <y>-1</y>
-      <width>1201</width>
-      <height>781</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="topLayout">
-     <item>
-      <widget class="QTabWidget" name="tabs">
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="menuTab">
-        <attribute name="title">
-         <string>Menu</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="recipesTab">
-        <attribute name="title">
-         <string>Recipes</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="ingredientsTab">
-        <attribute name="title">
-         <string>Ingredients</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="newRecipeTab">
-        <attribute name="title">
-         <string>New</string>
-        </attribute>
-       </widget>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabs">
+      <property name="currentIndex">
+       <number>3</number>
+      </property>
+      <widget class="QWidget" name="plannedTab">
+       <attribute name="title">
+        <string>Planned</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QColumnView" name="suggestionsView"/>
+        </item>
+        <item>
+         <widget class="QColumnView" name="plannedView"/>
+        </item>
+       </layout>
       </widget>
-     </item>
-    </layout>
-   </widget>
+      <widget class="QWidget" name="groceriesTab">
+       <attribute name="title">
+        <string>Groceries</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QGroupBox" name="groceriesControl">
+          <property name="title">
+           <string>Actions</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QLineEdit" name="leGrocery">
+             <property name="placeholderText">
+              <string>Add: &lt;amount&gt; [&lt;unit&gt;] &lt;name&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="bResetGroceries">
+             <property name="text">
+              <string>Reset</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="bClearGroceries">
+             <property name="text">
+              <string>Clear</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="groceriesControlSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTableView" name="groceriesView"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="recipesTab">
+       <attribute name="title">
+        <string>Recipes</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QTableView" name="recipesView"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="editRecipeTab">
+       <attribute name="title">
+        <string>Edit Recipe</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QGroupBox" name="editRecipeControls">
+          <property name="title">
+           <string>Controls</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QLineEdit" name="leRecipeTitle">
+             <property name="placeholderText">
+              <string>Title</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="leRecipeStep">
+             <property name="placeholderText">
+              <string>Ingredient: &lt;amount&gt; [&lt;unit&gt;] &lt;name&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="leRecipeIngredient">
+             <property name="placeholderText">
+              <string>Step</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="editRecipeControlsSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Editing: [New]</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="bSubmitRecipe">
+             <property name="text">
+              <string>Submit</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="bClearRecipe">
+             <property name="text">
+              <string>Clear</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="bCancelRecipe">
+             <property name="text">
+              <string>Cancel</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTableView" name="editRecipeView"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="ingredientsTab">
+       <attribute name="title">
+        <string>Ingredients</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QTableView" name="ingredientsView"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
