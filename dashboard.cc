@@ -4,12 +4,9 @@
 
 struct Dashboard::Impl
 {
-  Impl() {}
 };
 
-Dashboard::Dashboard()
-  : ui(new Ui::Dashboard)
-  , impl(std::make_unique<Impl>())
+Dashboard::Dashboard() : ui(new Ui::Dashboard), impl(std::make_unique<Impl>())
 {
   ui->setupUi(this);
 }
