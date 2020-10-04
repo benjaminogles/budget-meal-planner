@@ -1,0 +1,7 @@
+ui_*
+moc_*
+*.o
+*.pro.user
+Makefile
+.qmake.stash
+grocery-gui
