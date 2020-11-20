@@ -38,6 +38,15 @@ namespace
       return false;
 
     statement =
+      "create table if not exists unit_aliases ("
+      "id integer primary key asc,"
+      "unit integer not null references units(id),"
+      "alias text not null"
+      ");";
+    if (!query.exec(statement))
+      return false;
+
+    statement =
       "create table if not exists conversions ("
       "id integer primary key asc,"
       "from_unit integer not null references units(id),"
@@ -63,7 +72,7 @@ namespace
       "name text not null,"
       "staple integer not null default 0,"
       "price real not null default 0,"
-      "unit integer not null references units(id),"
+      "unit integer references units(id),"
       "quantity real not null default 0,"
       "constraint food_name_unique unique (name)"
       ");";
@@ -75,7 +84,7 @@ namespace
       "id integer primary key asc,"
       "recipe integer not null references recipes(id),"
       "food integer not null references foods(id),"
-      "unit integer not null references units(id),"
+      "unit integer references units(id),"
       "quantity real not null default 0"
       ");";
     if (!query.exec(statement))
