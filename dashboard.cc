@@ -5,12 +5,29 @@
 #include <QSqlQueryModel>
 #include <QSqlRelationalTableModel>
 #include <QSqlRelationalDelegate>
+#include <QSqlRecord>
 
 struct Dashboard::Impl
 {
+  Dashboard *dash;
+
+  Impl(Dashboard *dash) : dash(dash) {}
+
+  void insert_food()
+  {
+    QString name = dash->ui->leFood->text();
+    if (name.isEmpty())
+      return;
+
+    QSqlRelationalTableModel *table = static_cast<QSqlRelationalTableModel*>(dash->ui->foodsView->model());
+    QSqlRecord record = table->record();
+    record.setValue("name", name);
+    table->insertRecord(-1, record);
+  }
+
 };
 
-Dashboard::Dashboard() : ui(new Ui::Dashboard), impl(std::make_unique<Impl>())
+Dashboard::Dashboard() : ui(new Ui::Dashboard), impl(std::make_unique<Impl>(this))
 {
   ui->setupUi(this);
 
@@ -39,6 +56,8 @@ Dashboard::Dashboard() : ui(new Ui::Dashboard), impl(std::make_unique<Impl>())
   foods->select();
   ui->foodsView->setModel(foods);
   ui->foodsView->setSortingEnabled(true);
+
+  connect(ui->leFood, &QLineEdit::returnPressed, this, [this](){ impl->insert_food(); });
 
 #ifdef QT_NO_DEBUG
   ui->groceriesView->hideColumn(0);
