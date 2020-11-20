@@ -17,6 +17,9 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabs">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
       <widget class="QWidget" name="plannedTab">
        <attribute name="title">
         <string>Planned</string>
@@ -176,6 +179,13 @@
         <string>Foods</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QLineEdit" name="leFood">
+          <property name="placeholderText">
+           <string>Add: &lt;quantity&gt; [&lt;unit&gt;] &lt;name&gt; &lt;price&gt; [staple]</string>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QTableView" name="foodsView"/>
         </item>
