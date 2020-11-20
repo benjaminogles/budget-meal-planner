@@ -44,7 +44,7 @@
            <item>
             <widget class="QLineEdit" name="leGrocery">
              <property name="placeholderText">
-              <string>Add: &lt;amount&gt; [&lt;unit&gt;] &lt;name&gt;</string>
+              <string>Add: &lt;quantity&gt; [&lt;unit&gt;] &lt;name&gt;</string>
              </property>
             </widget>
            </item>
@@ -114,7 +114,7 @@
            <item>
             <widget class="QLineEdit" name="leRecipeStep">
              <property name="placeholderText">
-              <string>Ingredient: &lt;amount&gt; [&lt;unit&gt;] &lt;name&gt;</string>
+              <string>Ingredient: &lt;quantity&gt; [&lt;unit&gt;] &lt;name&gt;</string>
              </property>
             </widget>
            </item>
