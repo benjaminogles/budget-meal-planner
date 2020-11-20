@@ -17,9 +17,6 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabs">
-      <property name="currentIndex">
-       <number>3</number>
-      </property>
       <widget class="QWidget" name="plannedTab">
        <attribute name="title">
         <string>Planned</string>
@@ -27,9 +24,6 @@
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QListView" name="plannedView"/>
-        </item>
-        <item>
-         <widget class="QListView" name="suggestionsView"/>
         </item>
        </layout>
       </widget>
