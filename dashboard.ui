@@ -26,10 +26,10 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QColumnView" name="suggestionsView"/>
+         <widget class="QListView" name="plannedView"/>
         </item>
         <item>
-         <widget class="QColumnView" name="plannedView"/>
+         <widget class="QListView" name="suggestionsView"/>
         </item>
        </layout>
       </widget>
