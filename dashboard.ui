@@ -182,7 +182,7 @@
         <item>
          <widget class="QLineEdit" name="leFood">
           <property name="placeholderText">
-           <string>Add: &lt;quantity&gt; [&lt;unit&gt;] &lt;name&gt; &lt;price&gt; [staple]</string>
+           <string>Add: &lt;name&gt;</string>
           </property>
          </widget>
         </item>
