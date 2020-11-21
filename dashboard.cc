@@ -26,7 +26,6 @@ struct Dashboard::Impl
     QSqlTableModel *table = static_cast<QSqlTableModel*>(dash->ui->foodsView->model());
     table->insertRecord(-1, record);
   }
-
 };
 
 Dashboard::Dashboard() : ui(new Ui::Dashboard), impl(std::make_unique<Impl>(this))
