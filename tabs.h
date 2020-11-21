@@ -15,6 +15,9 @@ class Tabs : public QMainWindow
     Tabs();
     ~Tabs();
 
+  public slots:
+    void add_food();
+
   private:
     Ui::Tabs *ui;
     struct Impl;

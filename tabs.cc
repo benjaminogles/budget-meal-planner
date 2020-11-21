@@ -9,28 +9,10 @@
 
 struct Tabs::Impl
 {
-  Tabs *tabs;
-
-  Impl(Tabs *tabs) : tabs(tabs) {}
-
-  void insert_food()
-  {
-    QLineEdit *line = tabs->ui->leFood;
-    QString name = line->text();
-    if (name.isEmpty())
-      return;
-
-    QSqlRecord record;
-    record.append(QSqlField("name", QVariant::String));
-    record.setValue("name", name);
-
-    QSqlTableModel *table = static_cast<QSqlTableModel*>(tabs->ui->foodsView->model());
-    if (table->insertRecord(-1, record))
-      line->setText("");
-  }
+  QSqlTableModel *foods;
 };
 
-Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
+Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>())
 {
   ui->setupUi(this);
 
@@ -49,14 +31,14 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
   ui->recipesView->setModel(recipes);
   ui->recipesView->setSortingEnabled(true);
 
-  QSqlTableModel *foods = new QSqlTableModel(this);
-  foods->setEditStrategy(QSqlTableModel::OnFieldChange);
-  foods->setTable("foods");
-  foods->select();
-  ui->foodsView->setModel(foods);
+  impl->foods = new QSqlTableModel(this);
+  impl->foods->setEditStrategy(QSqlTableModel::OnFieldChange);
+  impl->foods->setTable("foods");
+  impl->foods->select();
+  ui->foodsView->setModel(impl->foods);
   ui->foodsView->setSortingEnabled(true);
 
-  connect(ui->leFood, &QLineEdit::returnPressed, this, [this](){ impl->insert_food(); });
+  connect(ui->leFood, &QLineEdit::returnPressed, this, &Tabs::add_food);
 
 #ifdef QT_NO_DEBUG
   ui->groceriesView->hideColumn(0);
@@ -67,4 +49,18 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
 Tabs::~Tabs()
 {
   delete ui;
+}
+
+void Tabs::add_food()
+{
+  QString name = ui->leFood->text();
+  if (name.isEmpty())
+    return;
+
+  QSqlRecord record;
+  record.append(QSqlField("name", QVariant::String));
+  record.setValue("name", name);
+
+  if (impl->foods->insertRecord(-1, record))
+    ui->leFood->setText("");
 }
