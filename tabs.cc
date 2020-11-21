@@ -9,41 +9,45 @@
 
 struct Tabs::Impl
 {
+  Tabs *tabs;
+  QSqlQueryModel *planned;
+  QSqlTableModel *groceries;
+  QSqlQueryModel *recipes;
   QSqlTableModel *foods;
+
+  Impl(Tabs *tabs) :
+    tabs(tabs),
+    planned(new QSqlQueryModel(tabs)),
+    groceries(new QSqlTableModel(tabs)),
+    recipes(new QSqlQueryModel(tabs)),
+    foods(new QSqlTableModel(tabs))
+  {
+    planned->setQuery("select name from recipes where planned != 0");
+    groceries->setEditStrategy(QSqlTableModel::OnFieldChange);
+    groceries->setTable("groceries");
+    groceries->select();
+    recipes->setQuery("select name from recipes");
+    foods->setEditStrategy(QSqlTableModel::OnFieldChange);
+    foods->setTable("foods");
+    foods->select();
+  }
 };
 
-Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>())
+Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
 {
   ui->setupUi(this);
-
-  QSqlQueryModel *planned = new QSqlQueryModel(this);
-  planned->setQuery("select name from recipes where planned != 0");
-  ui->plannedView->setModel(planned);
-
-  QSqlTableModel *groceries = new QSqlTableModel(this);
-  groceries->setEditStrategy(QSqlTableModel::OnFieldChange);
-  groceries->setTable("groceries");
-  groceries->select();
-  ui->groceriesView->setModel(groceries);
-
-  QSqlQueryModel *recipes = new QSqlQueryModel(this);
-  recipes->setQuery("select name from recipes");
-  ui->recipesView->setModel(recipes);
+  ui->plannedView->setModel(impl->planned);
+  ui->groceriesView->setModel(impl->groceries);
+  ui->recipesView->setModel(impl->recipes);
   ui->recipesView->setSortingEnabled(true);
-
-  impl->foods = new QSqlTableModel(this);
-  impl->foods->setEditStrategy(QSqlTableModel::OnFieldChange);
-  impl->foods->setTable("foods");
-  impl->foods->select();
   ui->foodsView->setModel(impl->foods);
   ui->foodsView->setSortingEnabled(true);
-
-  connect(ui->leFood, &QLineEdit::returnPressed, this, &Tabs::add_food);
-
 #ifdef QT_NO_DEBUG
   ui->groceriesView->hideColumn(0);
   ui->foodsView->hideColumn(0);
 #endif
+
+  connect(ui->leFood, &QLineEdit::returnPressed, this, &Tabs::add_food);
 }
 
 Tabs::~Tabs()
