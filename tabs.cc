@@ -1,21 +1,21 @@
 
-#include "dashboard.h"
-#include "ui_dashboard.h"
+#include "tabs.h"
+#include "ui_tabs.h"
 
 #include <QSqlField>
 #include <QSqlRecord>
 #include <QSqlQueryModel>
 #include <QSqlTableModel>
 
-struct Dashboard::Impl
+struct Tabs::Impl
 {
-  Dashboard *dash;
+  Tabs *tabs;
 
-  Impl(Dashboard *dash) : dash(dash) {}
+  Impl(Tabs *tabs) : tabs(tabs) {}
 
   void insert_food()
   {
-    QLineEdit *line = dash->ui->leFood;
+    QLineEdit *line = tabs->ui->leFood;
     QString name = line->text();
     if (name.isEmpty())
       return;
@@ -24,13 +24,13 @@ struct Dashboard::Impl
     record.append(QSqlField("name", QVariant::String));
     record.setValue("name", name);
 
-    QSqlTableModel *table = static_cast<QSqlTableModel*>(dash->ui->foodsView->model());
+    QSqlTableModel *table = static_cast<QSqlTableModel*>(tabs->ui->foodsView->model());
     if (table->insertRecord(-1, record))
       line->setText("");
   }
 };
 
-Dashboard::Dashboard() : ui(new Ui::Dashboard), impl(std::make_unique<Impl>(this))
+Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
 {
   ui->setupUi(this);
 
@@ -64,7 +64,7 @@ Dashboard::Dashboard() : ui(new Ui::Dashboard), impl(std::make_unique<Impl>(this
 #endif
 }
 
-Dashboard::~Dashboard()
+Tabs::~Tabs()
 {
   delete ui;
 }

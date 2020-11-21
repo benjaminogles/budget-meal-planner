@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dashboard</class>
- <widget class="QMainWindow" name="Dashboard">
+ <class>Tabs</class>
+ <widget class="QMainWindow" name="Tabs">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dashboard</string>
+   <string>Groceries</string>
   </property>
   <widget class="QWidget" name="top">
    <layout class="QVBoxLayout" name="verticalLayout">

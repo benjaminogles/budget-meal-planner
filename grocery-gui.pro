@@ -8,12 +8,12 @@ QT += core widgets sql
 SOURCES = \
   main.cc \
   app.cc \
-  dashboard.cc
+  tabs.cc
 
 HEADERS = \
   app.h \
-  dashboard.h
+  tabs.h
 
 FORMS = \
-  dashboard.ui
+  tabs.ui
 
