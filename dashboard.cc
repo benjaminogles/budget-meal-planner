@@ -15,7 +15,8 @@ struct Dashboard::Impl
 
   void insert_food()
   {
-    QString name = dash->ui->leFood->text();
+    QLineEdit *line = dash->ui->leFood;
+    QString name = line->text();
     if (name.isEmpty())
       return;
 
@@ -24,7 +25,8 @@ struct Dashboard::Impl
     record.setValue("name", name);
 
     QSqlTableModel *table = static_cast<QSqlTableModel*>(dash->ui->foodsView->model());
-    table->insertRecord(-1, record);
+    if (table->insertRecord(-1, record))
+      line->setText("");
   }
 };
 
