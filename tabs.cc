@@ -9,6 +9,19 @@
 #include <QSqlQueryModel>
 #include <QSqlTableModel>
 
+namespace
+{
+  void table_model_remove_rows(QItemSelectionModel *select, QSqlTableModel *model)
+  {
+    if (!select->hasSelection())
+      return;
+    auto indexes = select->selectedRows();
+    for (auto index : indexes)
+      model->removeRows(index.row(), 1);
+    model->select();
+  }
+}
+
 struct Tabs::Impl
 {
   Tabs *tabs;
@@ -95,14 +108,7 @@ void Tabs::add_food()
 
 void Tabs::remove_foods()
 {
-  auto select = ui->foodsView->selectionModel();
-  if (!select->hasSelection())
-    return;
-  int id_column = 0;
-  auto indexes = select->selectedRows(id_column);
-  for (auto index : indexes)
-    impl->foods->removeRows(index.row(), 1);
-  impl->foods->select();
+  table_model_remove_rows(ui->foodsView->selectionModel(), impl->foods);
 }
 
 void Tabs::reset_recipe_tab()
