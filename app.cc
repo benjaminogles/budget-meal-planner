@@ -38,7 +38,7 @@ App::App(int &argc, char **argv) : QApplication(argc, argv), impl(std::make_uniq
       dbsrc = argv[i + 1];
     }
   }
-  check_fatal(db_init(dbsrc), "Unable to connect or initialize database");
+  check_fatal(db_init(dbsrc), "Unable to connect to or initialize database");
   _app = this;
 }
 
