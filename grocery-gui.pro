@@ -9,12 +9,14 @@ SOURCES = \
   main.cc \
   database.cc \
   app.cc \
-  tabs.cc
+  tabs.cc \
+  nametoiddelegate.cc
 
 HEADERS = \
   database.h \
   app.h \
-  tabs.h
+  tabs.h \
+  nametoiddelegate.h
 
 FORMS = \
   tabs.ui

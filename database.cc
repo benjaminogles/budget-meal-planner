@@ -156,3 +156,13 @@ bool db_init(QString src)
 
   return true;
 }
+
+QMap<QString, int> db_unit_id_map()
+{
+  QMap<QString, int> result;
+  QSqlQuery query("select name, id from units;");
+  while (query.next())
+    result.insert(query.value(0).toString(), query.value(1).toInt());
+  return result;
+}
+

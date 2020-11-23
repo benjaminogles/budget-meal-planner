@@ -1,6 +1,8 @@
 
 #include "tabs.h"
 #include "ui_tabs.h"
+#include "database.h"
+#include "nametoiddelegate.h"
 
 #include <QSqlField>
 #include <QSqlRecord>
@@ -42,6 +44,8 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
   ui->recipesView->setSortingEnabled(true);
   ui->foodsView->setModel(impl->foods);
   ui->foodsView->setSortingEnabled(true);
+  ui->foodsView->setItemDelegateForColumn(4, new NameToIdDelegate(db_unit_id_map(), this));
+
 #ifdef QT_NO_DEBUG
   ui->groceriesView->hideColumn(0);
   ui->foodsView->hideColumn(0);

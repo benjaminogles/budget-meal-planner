@@ -1,0 +1,28 @@
+
+#ifndef nametoiddelegate_h
+#define nametoiddelegate_h
+
+#include <QStyledItemDelegate>
+#include <QMap>
+#include <memory>
+
+class NameToIdDelegate : public QStyledItemDelegate
+{
+
+  public:
+    NameToIdDelegate(QMap<QString, int> name_to_id, QObject *parent = nullptr);
+    ~NameToIdDelegate();
+
+    QWidget* createEditor(QWidget*, const QStyleOptionViewItem&, const QModelIndex&) const override;
+    void setEditorData(QWidget*, const QModelIndex&) const override;
+    void setModelData(QWidget*, QAbstractItemModel*, const QModelIndex&) const override;
+    void updateEditorGeometry(QWidget*, const QStyleOptionViewItem&, const QModelIndex&) const override;
+
+  public slots:
+    void addNameIdPair(QString, int);
+
+  private:
+    struct Impl;
+    std::unique_ptr<Impl> impl;
+};
+#endif
