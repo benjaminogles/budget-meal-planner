@@ -206,3 +206,14 @@ int db_add_recipe(QString)
 {
   return -1;
 }
+
+bool db_remove_id(QString table, int id)
+{
+  QSqlQuery query;
+  if (!query.prepare("delete from :table where id = :id;"))
+    return false;
+  query.bindValue(":table", table);
+  query.bindValue(":id", id);
+  return query.exec();
+}
+

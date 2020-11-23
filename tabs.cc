@@ -6,12 +6,13 @@
 
 #include <QSqlField>
 #include <QSqlRecord>
+#include <QSqlQuery>
 #include <QSqlQueryModel>
 #include <QSqlTableModel>
 
 namespace
 {
-  void table_model_remove_rows(QItemSelectionModel *select, QSqlTableModel *model)
+  void table_remove_rows(QItemSelectionModel *select, QSqlTableModel *model)
   {
     if (!select->hasSelection())
       return;
@@ -19,6 +20,21 @@ namespace
     for (auto index : indexes)
       model->removeRows(index.row(), 1);
     model->select();
+  }
+
+  void query_remove_ids(QItemSelectionModel *select, QSqlQueryModel *model, QString table, int id_column)
+  {
+    if (!select->hasSelection())
+      return;
+    auto indexes = select->selectedRows(id_column);
+    for (auto index : indexes)
+    {
+      QVariant var = model->data(index);
+      if (var.isNull())
+        continue;
+      db_remove_id(table, var.toInt());
+    }
+    model->setQuery(model->query());
   }
 }
 
@@ -38,7 +54,7 @@ struct Tabs::Impl
     recipes(new QSqlQueryModel(tabs)),
     foods(new QSqlTableModel(tabs))
   {
-    planned->setQuery("select name from recipes where planned != 0");
+    planned->setQuery("select id, name from recipes where planned != 0");
     groceries->setEditStrategy(QSqlTableModel::OnFieldChange);
     groceries->setTable("groceries");
     groceries->select();
@@ -76,6 +92,7 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
   ui->foodsView->setItemDelegateForColumn(4, new NameToIdDelegate(db_unit_id_map(), this));
 
 #ifdef QT_NO_DEBUG
+  ui->recipesView->hideColumn(0);
   ui->groceriesView->hideColumn(0);
   ui->foodsView->hideColumn(0);
 #endif
@@ -108,7 +125,12 @@ void Tabs::add_food()
 
 void Tabs::remove_foods()
 {
-  table_model_remove_rows(ui->foodsView->selectionModel(), impl->foods);
+  table_remove_rows(ui->foodsView->selectionModel(), impl->foods);
+}
+
+void Tabs::remove_recipes()
+{
+  query_remove_ids(ui->recipesView->selectionModel(), impl->recipes, "recipes", 0);
 }
 
 void Tabs::reset_recipe_tab()
