@@ -52,6 +52,10 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
 #endif
 
   connect(ui->leFood, &QLineEdit::returnPressed, this, &Tabs::add_food);
+
+  ui->tabs->setCurrentIndex(0);
+  ui->recipeTab->setEnabled(false);
+  ui->editRecipeControls->setVisible(false);
 }
 
 Tabs::~Tabs()
