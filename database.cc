@@ -7,6 +7,7 @@
 
 namespace
 {
+  int schema_version = 0;
   bool initialized = false;
 
   bool db_add_conversion(QSqlQuery prepared, QString from, QString to, double factor)
@@ -15,6 +16,71 @@ namespace
     prepared.bindValue(":to_unit", QVariant(to));
     prepared.bindValue(":factor", QVariant(factor));
     return prepared.exec();
+  }
+
+  int db_schema_version()
+  {
+    QSqlQuery query("select value from schema_versions order by value asc limit 1;");
+    if (query.next())
+      return query.value(0).toInt();
+    return -1;
+  }
+
+  bool db_set_schema_version()
+  {
+    QSqlQuery query;
+    if (!query.prepare("insert into schema_versions (value) values (?)"))
+      return false;
+    query.addBindValue(QVariant(schema_version));
+    return query.exec();
+  }
+
+  bool db_init_units()
+  {
+    QString statement;
+    QSqlQuery query;
+
+    statement =
+      "insert into units (name) values"
+      "('pinch'),"
+      "('teaspoon'),"
+      "('tablespoon'),"
+      "('cup'),"
+      "('quart'),"
+      "('pint'),"
+      "('gallon'),"
+      "('milliliter'),"
+      "('liter'),"
+      "('ounce'),"
+      "('pound'),"
+      "('gram')"
+      ";";
+    if (!query.exec(statement))
+      return false;
+
+    statement =
+      "insert into conversions (from_unit, to_unit, factor) values ("
+      "(select id from units where name = :from_unit),"
+      "(select id from units where name = :to_unit),"
+      ":factor"
+      ");";
+    if (!query.prepare(statement))
+      return false;
+
+    if (!db_add_conversion(query, "teaspoon", "tablespoon", 3.0))
+      return false;
+    if (!db_add_conversion(query, "tablespoon", "teaspoon", 0.333))
+      return false;
+    if (!db_add_conversion(query, "tablespoon", "cup", 16.231))
+      return false;
+    if (!db_add_conversion(query, "cup", "tablespoon", 0.0616))
+      return false;
+    if (!db_add_conversion(query, "cup", "quart", 4.0))
+      return false;
+    if (!db_add_conversion(query, "quart", "cup", 0.25))
+      return false;
+
+    return true;
   }
 }
 
@@ -37,9 +103,15 @@ bool db_init(QString src)
 
   statement = 
     "create table if not exists schema_versions ("
-    "id integer primary key asc"
+    "id integer primary key asc,"
+    "value integer"
     ");";
   if (!query.exec(statement))
+    return false;
+
+  int current_version = db_schema_version();
+  bool fresh = current_version < 0;
+  if (current_version < schema_version && !db_set_schema_version())
     return false;
 
   statement =
@@ -115,44 +187,7 @@ bool db_init(QString src)
   if (!query.exec(statement))
     return false;
 
-  statement =
-    "insert into units (name) values"
-    "('pinch'),"
-    "('teaspoon'),"
-    "('tablespoon'),"
-    "('cup'),"
-    "('quart'),"
-    "('pint'),"
-    "('gallon'),"
-    "('milliliter'),"
-    "('liter'),"
-    "('ounce'),"
-    "('pound'),"
-    "('gram')"
-    ";";
-  if (!query.exec(statement))
-    return false;
-
-  statement =
-    "insert into conversions (from_unit, to_unit, factor) values ("
-    "(select id from units where name = :from_unit),"
-    "(select id from units where name = :to_unit),"
-    ":factor"
-    ");";
-  if (!query.prepare(statement))
-    return false;
-
-  if (!db_add_conversion(query, "teaspoon", "tablespoon", 3.0))
-    return false;
-  if (!db_add_conversion(query, "tablespoon", "teaspoon", 0.333))
-    return false;
-  if (!db_add_conversion(query, "tablespoon", "cup", 16.231))
-    return false;
-  if (!db_add_conversion(query, "cup", "tablespoon", 0.0616))
-    return false;
-  if (!db_add_conversion(query, "cup", "quart", 4.0))
-    return false;
-  if (!db_add_conversion(query, "quart", "cup", 0.25))
+  if (fresh && !db_init_units())
     return false;
 
   return true;
