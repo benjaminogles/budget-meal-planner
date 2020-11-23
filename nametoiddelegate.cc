@@ -71,3 +71,9 @@ QString NameToIdDelegate::displayText(const QVariant &value, const QLocale&) con
   return impl->id_to_name[value.toInt()];
 }
 
+
+void NameToIdDelegate::addNameIdPair(QString name, int id)
+{
+  impl->name_to_id.insert(name, id);
+  impl->id_to_name.insert(id, name);
+}
