@@ -39,11 +39,26 @@ struct Tabs::Impl
 Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
 {
   ui->setupUi(this);
+
   ui->plannedView->setModel(impl->planned);
+  ui->plannedView->setSelectionMode(QAbstractItemView::MultiSelection);
+  ui->plannedView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
   ui->groceriesView->setModel(impl->groceries);
+  ui->groceriesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  ui->groceriesView->setSelectionMode(QAbstractItemView::MultiSelection);
+  ui->groceriesView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
   ui->recipesView->setModel(impl->recipes);
+  ui->recipesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  ui->recipesView->setSelectionMode(QAbstractItemView::MultiSelection);
+  ui->recipesView->setSelectionBehavior(QAbstractItemView::SelectRows);
   ui->recipesView->setSortingEnabled(true);
+
   ui->foodsView->setModel(impl->foods);
+  ui->foodsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  ui->foodsView->setSelectionMode(QAbstractItemView::MultiSelection);
+  ui->foodsView->setSelectionBehavior(QAbstractItemView::SelectRows);
   ui->foodsView->setSortingEnabled(true);
   ui->foodsView->setItemDelegateForColumn(4, new NameToIdDelegate(db_unit_id_map(), this));
 
