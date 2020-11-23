@@ -68,6 +68,7 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
 #endif
 
   connect(ui->leFood, &QLineEdit::returnPressed, this, &Tabs::add_food);
+  connect(ui->bDeleteFood, &QPushButton::released, this, &Tabs::remove_foods);
 
   ui->tabs->setCurrentIndex(0);
   ui->recipeTab->setEnabled(false);
@@ -90,6 +91,18 @@ void Tabs::add_food()
 
   if (impl->foods->insertRecord(-1, record))
     ui->leFood->setText("");
+}
+
+void Tabs::remove_foods()
+{
+  auto select = ui->foodsView->selectionModel();
+  if (!select->hasSelection())
+    return;
+  int id_column = 0;
+  auto indexes = select->selectedRows(id_column);
+  for (auto index : indexes)
+    impl->foods->removeRows(index.row(), 1);
+  impl->foods->select();
 }
 
 void Tabs::reset_recipe_tab()
