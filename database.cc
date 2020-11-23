@@ -76,6 +76,7 @@ bool db_init(QString src)
     "name text not null,"
     "planned integer not null default 0,"
     "meals integer not null default 0,"
+    "steps text not null default '',"
     "constraint recipe_name_unique unique (name)"
     ");";
   if (!query.exec(statement))
@@ -166,3 +167,7 @@ QMap<QString, int> db_unit_id_map()
   return result;
 }
 
+int db_add_recipe(QString)
+{
+  return -1;
+}

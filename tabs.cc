@@ -16,6 +16,7 @@ struct Tabs::Impl
   QSqlTableModel *groceries;
   QSqlQueryModel *recipes;
   QSqlTableModel *foods;
+  int recipe_id = -1;
 
   Impl(Tabs *tabs) :
     tabs(tabs),
@@ -55,7 +56,6 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
 
   ui->tabs->setCurrentIndex(0);
   ui->recipeTab->setEnabled(false);
-  ui->editRecipeControls->setVisible(false);
 }
 
 Tabs::~Tabs()
@@ -76,3 +76,21 @@ void Tabs::add_food()
   if (impl->foods->insertRecord(-1, record))
     ui->leFood->setText("");
 }
+
+void Tabs::reset_recipe_tab()
+{
+
+}
+
+void Tabs::start_edit_recipe(int)
+{
+
+}
+
+void Tabs::start_add_recipe()
+{
+  int id = db_add_recipe("Untitled");
+  if (id >= 0)
+    start_edit_recipe(id);
+}
+

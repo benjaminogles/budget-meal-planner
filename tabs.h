@@ -17,6 +17,9 @@ class Tabs : public QMainWindow
 
   public slots:
     void add_food();
+    void reset_recipe_tab();
+    void start_edit_recipe(int);
+    void start_add_recipe();
 
   private:
     Ui::Tabs *ui;
