@@ -17,6 +17,7 @@ class NameToIdDelegate : public QStyledItemDelegate
     void setEditorData(QWidget*, const QModelIndex&) const override;
     void setModelData(QWidget*, QAbstractItemModel*, const QModelIndex&) const override;
     void updateEditorGeometry(QWidget*, const QStyleOptionViewItem&, const QModelIndex&) const override;
+    QString displayText(const QVariant&, const QLocale&) const override;
 
   public slots:
     void addNameIdPair(QString, int);

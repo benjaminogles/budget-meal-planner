@@ -8,9 +8,16 @@
 struct NameToIdDelegate::Impl
 {
   QMap<QString, int> name_to_id;
+  QMap<int, QString> id_to_name;
 
   Impl(QMap<QString, int> name_to_id) : name_to_id(name_to_id)
   {
+    auto i = name_to_id.constBegin();
+    while (i != name_to_id.constEnd())
+    {
+      id_to_name.insert(i.value(), i.key());
+      i++;
+    }
   }
 };
 
@@ -37,7 +44,7 @@ QWidget* NameToIdDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
 void NameToIdDelegate::setEditorData(QWidget *wid, const QModelIndex &index) const
 {
   QLineEdit *editor = qobject_cast<QLineEdit*>(wid);
-  editor->setText(index.model()->data(index).toString());
+  editor->setText(displayText(index.model()->data(index), QLocale()));
 }
 
 void NameToIdDelegate::setModelData(QWidget *wid, QAbstractItemModel *model, const QModelIndex &index) const
@@ -56,3 +63,11 @@ void NameToIdDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
 {
   editor->setGeometry(item.rect);
 }
+
+QString NameToIdDelegate::displayText(const QVariant &value, const QLocale&) const
+{
+  if (value.isNull() || !impl->id_to_name.contains(value.toInt()))
+    return "";
+  return impl->id_to_name[value.toInt()];
+}
+
