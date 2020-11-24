@@ -240,3 +240,23 @@ QString db_recipe_steps(int id)
   return db_field_by_id("recipes", "steps", id).toString();
 }
 
+bool db_set_recipe_name(int id, QString name)
+{
+  QSqlQuery query;
+  if (!query.prepare("update recipes set name = :name where id = :id;"))
+    return false;
+  query.bindValue(":name", name);
+  query.bindValue(":id", id);
+  return query.exec();
+}
+
+bool db_set_recipe_steps(int id, QString steps)
+{
+  QSqlQuery query;
+  if (!query.prepare("update recipes set steps = :steps where id = :id;"))
+    return false;
+  query.bindValue(":steps", steps);
+  query.bindValue(":id", id);
+  return query.exec();
+}
+

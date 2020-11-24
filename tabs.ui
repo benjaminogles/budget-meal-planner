@@ -179,6 +179,13 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QPushButton" name="bDoneRecipe">
+             <property name="text">
+              <string>Done</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -194,6 +201,13 @@
            </item>
            <item>
             <widget class="QTableView" name="ingredientsView"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="bDeleteIngredient">
+             <property name="text">
+              <string>Delete</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

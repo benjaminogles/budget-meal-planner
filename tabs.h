@@ -19,9 +19,12 @@ class Tabs : public QMainWindow
     void add_food();
     void remove_foods();
     void remove_recipes();
+    void set_recipe_name(QString);
+    void set_recipe_steps();
     void reset_recipe_tab();
     void start_edit_recipe(int);
     void start_add_recipe();
+    void stop_edit_recipe();
 
   private:
     Ui::Tabs *ui;

@@ -17,4 +17,8 @@ QString db_recipe_name(int);
 
 QString db_recipe_steps(int);
 
+bool db_set_recipe_name(int, QString);
+
+bool db_set_recipe_steps(int, QString);
+
 #endif

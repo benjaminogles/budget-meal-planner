@@ -12,6 +12,7 @@
 
 namespace
 {
+  const int recipes_tab_idx = 0;
   const int recipe_tab_idx = 3;
 
   QList<int> table_remove_rows(QItemSelectionModel *select, QSqlTableModel *model, int id_column)
@@ -121,10 +122,13 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
 
   connect(ui->bAddRecipe, &QPushButton::released, this, &Tabs::start_add_recipe);
   connect(ui->bDeleteRecipe, &QPushButton::released, this, &Tabs::remove_recipes);
+  connect(ui->leRecipeTitle, &QLineEdit::textEdited, this, &Tabs::set_recipe_name);
+  connect(ui->teRecipeSteps, &QPlainTextEdit::textChanged, this, &Tabs::set_recipe_steps);
+  connect(ui->bDoneRecipe, &QPushButton::released, this, &Tabs::stop_edit_recipe);
   connect(ui->leFood, &QLineEdit::returnPressed, this, &Tabs::add_food);
   connect(ui->bDeleteFood, &QPushButton::released, this, &Tabs::remove_foods);
 
-  ui->tabs->setCurrentIndex(0);
+  ui->tabs->setCurrentIndex(recipes_tab_idx);
   ui->recipeTab->setEnabled(false);
 }
 
@@ -159,6 +163,19 @@ void Tabs::remove_recipes()
     reset_recipe_tab();
 }
 
+void Tabs::set_recipe_name(QString name)
+{
+  if (impl->recipe_id >= 0)
+    db_set_recipe_name(impl->recipe_id, name);
+}
+
+void Tabs::set_recipe_steps()
+{
+  QString text = ui->teRecipeSteps->toPlainText();
+  if (impl->recipe_id >= 0)
+    db_set_recipe_steps(impl->recipe_id, text);
+}
+
 void Tabs::reset_recipe_tab()
 {
   impl->recipe_id = -1;
@@ -187,5 +204,12 @@ void Tabs::start_add_recipe()
     query_refresh(impl->recipes);
     start_edit_recipe(id);
   }
+}
+
+void Tabs::stop_edit_recipe()
+{
+  query_refresh(impl->recipes);
+  reset_recipe_tab();
+  ui->tabs->setCurrentIndex(recipes_tab_idx);
 }
 
