@@ -24,7 +24,7 @@ namespace
     for (auto index : indexes)
     {
       if (model->removeRows(index.row(), 1))
-        removed.append(model->data(index).toInt());
+        removed.append(index.data().toInt());
     }
     model->select();
     return removed;
@@ -45,7 +45,7 @@ namespace
     auto indexes = select->selectedRows(id_column);
     for (auto index : indexes)
     {
-      QVariant var = model->data(index);
+      QVariant var = index.data();
       if (var.isNull())
         continue;
       if (db_remove_id(table, var.toInt()))
@@ -127,6 +127,7 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
   connect(ui->bDoneRecipe, &QPushButton::released, this, &Tabs::stop_edit_recipe);
   connect(ui->leFood, &QLineEdit::returnPressed, this, &Tabs::add_food);
   connect(ui->bDeleteFood, &QPushButton::released, this, &Tabs::remove_foods);
+  connect(ui->recipesView, &QTableView::doubleClicked, this, &Tabs::recipe_double_clicked);
 
   ui->tabs->setCurrentIndex(recipes_tab_idx);
   ui->recipeTab->setEnabled(false);
@@ -163,7 +164,7 @@ void Tabs::remove_recipes()
     reset_recipe_tab();
 }
 
-void Tabs::set_recipe_name(QString name)
+void Tabs::set_recipe_name(const QString &name)
 {
   if (impl->recipe_id >= 0)
     db_set_recipe_name(impl->recipe_id, name);
@@ -213,3 +214,7 @@ void Tabs::stop_edit_recipe()
   ui->tabs->setCurrentIndex(recipes_tab_idx);
 }
 
+void Tabs::recipe_double_clicked(const QModelIndex &index)
+{
+  start_edit_recipe(index.siblingAtColumn(0).data().toInt());
+}
