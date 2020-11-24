@@ -148,8 +148,7 @@ bool db_init(QString src)
     "name text not null,"
     "planned integer not null default 0,"
     "meals integer not null default 0,"
-    "steps text not null default '',"
-    "constraint recipe_name_unique unique (name)"
+    "steps text not null default ''"
     ");";
   if (!query.exec(statement))
     return false;
