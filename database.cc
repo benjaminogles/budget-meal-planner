@@ -82,6 +82,17 @@ namespace
 
     return true;
   }
+
+  QVariant db_field_by_id(QString table, QString field, int id)
+  {
+    QSqlQuery query;
+    if (!query.prepare(QString("select %1 from %2 where id = :id").arg(field).arg(table)))
+      return QVariant();
+    query.bindValue(":id", id);
+    if (!query.exec() || !query.next())
+      return QVariant();
+    return query.value(0);
+  }
 }
 
 bool db_init(QString src)
@@ -201,18 +212,31 @@ QMap<QString, int> db_unit_id_map()
   return result;
 }
 
-int db_add_recipe(QString)
+int db_add_recipe(QString name)
 {
-  return -1;
+  QSqlQuery query;
+  if (!query.prepare("insert into recipes (name) values (?);"))
+    return -1;
+  query.addBindValue(name);
+  return query.exec() ? query.lastInsertId().toInt() : -1;
 }
 
 bool db_remove_id(QString table, int id)
 {
   QSqlQuery query;
-  if (!query.prepare("delete from :table where id = :id;"))
+  if (!query.prepare(QString("delete from %1 where id = :id;").arg(table)))
     return false;
-  query.bindValue(":table", table);
   query.bindValue(":id", id);
   return query.exec();
+}
+
+QString db_recipe_name(int id)
+{
+  return db_field_by_id("recipes", "name", id).toString();
+}
+
+QString db_recipe_steps(int id)
+{
+  return db_field_by_id("recipes", "steps", id).toString();
 }
 

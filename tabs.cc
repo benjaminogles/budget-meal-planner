@@ -12,6 +12,8 @@
 
 namespace
 {
+  const int recipe_tab_idx = 3;
+
   void table_remove_rows(QItemSelectionModel *select, QSqlTableModel *model)
   {
     if (!select->hasSelection())
@@ -20,6 +22,13 @@ namespace
     for (auto index : indexes)
       model->removeRows(index.row(), 1);
     model->select();
+  }
+
+  void query_refresh(QSqlQueryModel *model)
+  {
+    QString str = model->query().executedQuery();
+    model->query().clear();
+    model->setQuery(str);
   }
 
   void query_remove_ids(QItemSelectionModel *select, QSqlQueryModel *model, QString table, int id_column)
@@ -34,7 +43,7 @@ namespace
         continue;
       db_remove_id(table, var.toInt());
     }
-    model->setQuery(model->query());
+    query_refresh(model);
   }
 }
 
@@ -45,6 +54,7 @@ struct Tabs::Impl
   QSqlTableModel *groceries;
   QSqlQueryModel *recipes;
   QSqlTableModel *foods;
+  QSqlTableModel *ingredients;
   int recipe_id = -1;
 
   Impl(Tabs *tabs) :
@@ -52,7 +62,8 @@ struct Tabs::Impl
     planned(new QSqlQueryModel(tabs)),
     groceries(new QSqlTableModel(tabs)),
     recipes(new QSqlQueryModel(tabs)),
-    foods(new QSqlTableModel(tabs))
+    foods(new QSqlTableModel(tabs)),
+    ingredients(new QSqlTableModel(tabs))
   {
     planned->setQuery("select id, name from recipes where planned != 0");
     groceries->setEditStrategy(QSqlTableModel::OnFieldChange);
@@ -62,6 +73,9 @@ struct Tabs::Impl
     foods->setEditStrategy(QSqlTableModel::OnFieldChange);
     foods->setTable("foods");
     foods->select();
+    ingredients->setEditStrategy(QSqlTableModel::OnFieldChange);
+    ingredients->setTable("ingredients");
+    ingredients->setFilter("recipe is null");
   }
 };
 
@@ -97,6 +111,8 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
   ui->foodsView->hideColumn(0);
 #endif
 
+  connect(ui->bAddRecipe, &QPushButton::released, this, &Tabs::start_add_recipe);
+  connect(ui->bDeleteRecipe, &QPushButton::released, this, &Tabs::remove_recipes);
   connect(ui->leFood, &QLineEdit::returnPressed, this, &Tabs::add_food);
   connect(ui->bDeleteFood, &QPushButton::released, this, &Tabs::remove_foods);
 
@@ -120,7 +136,7 @@ void Tabs::add_food()
   record.setValue("name", name);
 
   if (impl->foods->insertRecord(-1, record))
-    ui->leFood->setText("");
+    ui->leFood->clear();
 }
 
 void Tabs::remove_foods()
@@ -135,18 +151,31 @@ void Tabs::remove_recipes()
 
 void Tabs::reset_recipe_tab()
 {
-
+  impl->recipe_id = -1;
+  ui->leRecipeTitle->clear();
+  ui->teRecipeSteps->clear();
+  impl->ingredients->setFilter("recipe is null");
+  ui->recipeTab->setEnabled(false);
 }
 
-void Tabs::start_edit_recipe(int)
+void Tabs::start_edit_recipe(int id)
 {
-
+  reset_recipe_tab();
+  ui->leRecipeTitle->setText(db_recipe_name(id));
+  ui->teRecipeSteps->setPlainText(db_recipe_steps(id));
+  impl->ingredients->setFilter(QString("recipe = %1").arg(id));
+  ui->recipeTab->setEnabled(true);
+  impl->recipe_id = id;
+  ui->tabs->setCurrentIndex(recipe_tab_idx);
 }
 
 void Tabs::start_add_recipe()
 {
   int id = db_add_recipe("Untitled");
   if (id >= 0)
+  {
+    query_refresh(impl->recipes);
     start_edit_recipe(id);
+  }
 }
 

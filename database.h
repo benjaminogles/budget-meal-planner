@@ -13,4 +13,8 @@ int db_add_recipe(QString);
 
 bool db_remove_id(QString, int);
 
+QString db_recipe_name(int);
+
+QString db_recipe_steps(int);
+
 #endif
