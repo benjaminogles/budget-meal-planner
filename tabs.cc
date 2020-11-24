@@ -58,7 +58,7 @@ struct Tabs::Impl
     groceries->setEditStrategy(QSqlTableModel::OnFieldChange);
     groceries->setTable("groceries");
     groceries->select();
-    recipes->setQuery("select name from recipes");
+    recipes->setQuery("select id, name from recipes");
     foods->setEditStrategy(QSqlTableModel::OnFieldChange);
     foods->setTable("foods");
     foods->select();
