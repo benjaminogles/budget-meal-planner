@@ -154,7 +154,9 @@ void Tabs::remove_foods()
 
 void Tabs::remove_recipes()
 {
-  query_remove_ids(ui->recipesView->selectionModel(), impl->recipes, "recipes", 0);
+  QList<int> removed = query_remove_ids(ui->recipesView->selectionModel(), impl->recipes, "recipes", 0);
+  if (removed.contains(impl->recipe_id))
+    reset_recipe_tab();
 }
 
 void Tabs::reset_recipe_tab()
