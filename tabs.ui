@@ -195,7 +195,7 @@
            <item>
             <widget class="QLineEdit" name="leRecipeIngredient">
              <property name="placeholderText">
-              <string>Add Ingredient: &lt;quantity&gt; [&lt;unit&gt;] &lt;name&gt;</string>
+              <string>Add: &lt;name&gt;</string>
              </property>
             </widget>
            </item>

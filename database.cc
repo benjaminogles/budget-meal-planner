@@ -260,3 +260,41 @@ bool db_set_recipe_steps(int id, QString steps)
   return query.exec();
 }
 
+QStringList db_food_names()
+{
+  QStringList result;
+  QSqlQuery query("select name from foods;");
+  while (query.next())
+    result.append(query.value(0).toString());
+  return result;
+}
+
+QMap<QString, int> db_food_id_map()
+{
+  QMap<QString, int> result;
+  QSqlQuery query("select name, id from foods;");
+  while (query.next())
+    result.insert(query.value(0).toString(), query.value(1).toInt());
+  return result;
+}
+
+int db_food_id(QString name)
+{
+  QSqlQuery query;
+  if (!query.prepare("select id from foods where name = :name;"))
+    return -1;
+  query.bindValue(":name", name);
+  if (!query.exec() || !query.next())
+    return -1;
+  return query.value(0).toInt();
+}
+
+int db_add_food(QString name)
+{
+  QSqlQuery query;
+  if (!query.prepare("insert into foods (name) values (?);"))
+    return -1;
+  query.addBindValue(name);
+  return query.exec() ? query.lastInsertId().toInt() : -1;
+}
+

@@ -9,6 +9,7 @@
 #include <QSqlQuery>
 #include <QSqlQueryModel>
 #include <QSqlTableModel>
+#include <QCompleter>
 
 namespace
 {
@@ -64,6 +65,7 @@ struct Tabs::Impl
   QSqlQueryModel *recipes;
   QSqlTableModel *foods;
   QSqlTableModel *ingredients;
+  QCompleter *food_completer;
   int recipe_id = -1;
 
   Impl(Tabs *tabs) :
@@ -72,7 +74,8 @@ struct Tabs::Impl
     groceries(new QSqlTableModel(tabs)),
     recipes(new QSqlQueryModel(tabs)),
     foods(new QSqlTableModel(tabs)),
-    ingredients(new QSqlTableModel(tabs))
+    ingredients(new QSqlTableModel(tabs)),
+    food_completer(new QCompleter(db_food_names(), tabs))
   {
     planned->setQuery("select id, name from recipes where planned != 0");
     groceries->setEditStrategy(QSqlTableModel::OnFieldChange);
@@ -114,10 +117,19 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
   ui->foodsView->setSortingEnabled(true);
   ui->foodsView->setItemDelegateForColumn(4, new NameToIdDelegate(db_unit_id_map(), this));
 
+  ui->ingredientsView->setModel(impl->ingredients);
+  ui->ingredientsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  ui->ingredientsView->setSelectionMode(QAbstractItemView::MultiSelection);
+  ui->ingredientsView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  ui->foodsView->setItemDelegateForColumn(2, new NameToIdDelegate(db_food_id_map(), this));
+  ui->foodsView->setItemDelegateForColumn(3, new NameToIdDelegate(db_unit_id_map(), this));
+
 #ifdef QT_NO_DEBUG
   ui->recipesView->hideColumn(0);
   ui->groceriesView->hideColumn(0);
   ui->foodsView->hideColumn(0);
+  ui->ingredientsView->hideColumn(0);
+  ui->ingredientsView->hideColumn(1);
 #endif
 
   connect(ui->bAddRecipe, &QPushButton::released, this, &Tabs::start_add_recipe);
@@ -128,6 +140,8 @@ Tabs::Tabs() : ui(new Ui::Tabs), impl(std::make_unique<Impl>(this))
   connect(ui->leFood, &QLineEdit::returnPressed, this, &Tabs::add_food);
   connect(ui->bDeleteFood, &QPushButton::released, this, &Tabs::remove_foods);
   connect(ui->recipesView, &QTableView::doubleClicked, this, &Tabs::recipe_double_clicked);
+  connect(ui->leRecipeIngredient, &QLineEdit::returnPressed, this, &Tabs::add_ingredient);
+  connect(ui->bDeleteIngredient, &QPushButton::released, this, &Tabs::remove_ingredients);
 
   ui->tabs->setCurrentIndex(recipes_tab_idx);
   ui->recipeTab->setEnabled(false);
@@ -218,3 +232,36 @@ void Tabs::recipe_double_clicked(const QModelIndex &index)
 {
   start_edit_recipe(index.siblingAtColumn(0).data().toInt());
 }
+
+void Tabs::add_ingredient()
+{
+  if (impl->recipe_id < 0)
+    return;
+
+  QString name = ui->leRecipeIngredient->text();
+  if (name.isEmpty())
+    return;
+
+  int food_id = db_food_id(name);
+  if (food_id < 0)
+  {
+    food_id = db_add_food(name);
+    if (food_id < 0)
+      return;
+  }
+
+  QSqlRecord record;
+  record.append(QSqlField("recipe", QVariant::Int));
+  record.append(QSqlField("food", QVariant::Int));
+  record.setValue("recipe", impl->recipe_id);
+  record.setValue("food", food_id);
+
+  if (impl->ingredients->insertRecord(-1, record))
+    ui->leRecipeIngredient->clear();
+}
+
+void Tabs::remove_ingredients()
+{
+  table_remove_rows(ui->ingredientsView->selectionModel(), impl->ingredients, 0);
+}
+

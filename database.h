@@ -3,11 +3,14 @@
 #define database_h
 
 #include <QString>
+#include <QStringList>
 #include <QMap>
 
 bool db_init(QString);
 
 QMap<QString, int> db_unit_id_map();
+
+QMap<QString, int> db_food_id_map();
 
 int db_add_recipe(QString);
 
@@ -20,5 +23,11 @@ QString db_recipe_steps(int);
 bool db_set_recipe_name(int, QString);
 
 bool db_set_recipe_steps(int, QString);
+
+QStringList db_food_names();
+
+int db_food_id(QString);
+
+int db_add_food(QString);
 
 #endif

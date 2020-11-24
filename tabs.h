@@ -21,6 +21,8 @@ class Tabs : public QMainWindow
     void remove_recipes();
     void set_recipe_name(const QString&);
     void set_recipe_steps();
+    void add_ingredient();
+    void remove_ingredients();
     void reset_recipe_tab();
     void start_edit_recipe(int);
     void start_add_recipe();
