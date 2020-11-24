@@ -192,7 +192,7 @@ bool db_init(QString src)
     "create table if not exists groceries ("
     "id integer primary key asc,"
     "food integer not null references foods(id),"
-    "quantity real not null default 0"
+    "quantity real not null default 1"
     ");";
   if (!query.exec(statement))
     return false;
