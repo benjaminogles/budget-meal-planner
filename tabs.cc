@@ -14,14 +14,19 @@ namespace
 {
   const int recipe_tab_idx = 3;
 
-  void table_remove_rows(QItemSelectionModel *select, QSqlTableModel *model)
+  QList<int> table_remove_rows(QItemSelectionModel *select, QSqlTableModel *model, int id_column)
   {
+    QList<int> removed;
     if (!select->hasSelection())
-      return;
-    auto indexes = select->selectedRows();
+      return removed;
+    auto indexes = select->selectedRows(id_column);
     for (auto index : indexes)
-      model->removeRows(index.row(), 1);
+    {
+      if (model->removeRows(index.row(), 1))
+        removed.append(model->data(index).toInt());
+    }
     model->select();
+    return removed;
   }
 
   void query_refresh(QSqlQueryModel *model)
@@ -31,19 +36,22 @@ namespace
     model->setQuery(str);
   }
 
-  void query_remove_ids(QItemSelectionModel *select, QSqlQueryModel *model, QString table, int id_column)
+  QList<int> query_remove_ids(QItemSelectionModel *select, QSqlQueryModel *model, QString table, int id_column)
   {
+    QList<int> removed;
     if (!select->hasSelection())
-      return;
+      return removed;
     auto indexes = select->selectedRows(id_column);
     for (auto index : indexes)
     {
       QVariant var = model->data(index);
       if (var.isNull())
         continue;
-      db_remove_id(table, var.toInt());
+      if (db_remove_id(table, var.toInt()))
+        removed.append(var.toInt());
     }
     query_refresh(model);
+    return removed;
   }
 }
 
@@ -141,7 +149,7 @@ void Tabs::add_food()
 
 void Tabs::remove_foods()
 {
-  table_remove_rows(ui->foodsView->selectionModel(), impl->foods);
+  table_remove_rows(ui->foodsView->selectionModel(), impl->foods, 0);
 }
 
 void Tabs::remove_recipes()
