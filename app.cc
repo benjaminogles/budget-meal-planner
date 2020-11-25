@@ -68,8 +68,8 @@ struct App::Impl
   QCompleter *food_completer;
   int recipe_id = -1;
 
-  Impl(App *app) :
-    app(app),
+  Impl(App *app_) :
+    app(app_),
     planned(new QSqlQueryModel(app)),
     groceries(new QSqlTableModel(app)),
     recipes(new QSqlQueryModel(app)),
@@ -78,16 +78,126 @@ struct App::Impl
     food_completer(new QCompleter(db_food_names(), app))
   {
     planned->setQuery("select id, name from recipes where planned != 0");
+
     groceries->setEditStrategy(QSqlTableModel::OnFieldChange);
     groceries->setTable("groceries");
     groceries->select();
+
     recipes->setQuery("select id, name from recipes");
+
     foods->setEditStrategy(QSqlTableModel::OnFieldChange);
     foods->setTable("foods");
     foods->select();
+
     ingredients->setEditStrategy(QSqlTableModel::OnFieldChange);
     ingredients->setTable("ingredients");
     ingredients->setFilter("recipe is null");
+  }
+
+  void reset_recipe_tab()
+  {
+    recipe_id = -1;
+    ingredients->setFilter("recipe is null");
+    app->ui->leRecipeTitle->clear();
+    app->ui->teRecipeSteps->clear();
+    app->ui->recipeTab->setEnabled(false);
+  }
+
+  void start_edit_recipe(int id)
+  {
+    if (recipe_id >= 0)
+      reset_recipe_tab();
+    ingredients->setFilter(QString("recipe = %1").arg(id));
+    app->ui->leRecipeTitle->setText(db_recipe_name(id));
+    app->ui->teRecipeSteps->setPlainText(db_recipe_steps(id));
+    app->ui->recipeTab->setEnabled(true);
+    app->ui->tabs->setCurrentIndex(recipe_tab_idx);
+    recipe_id = id;
+  }
+
+  void start_add_recipe(QString name)
+  {
+    int id = db_add_recipe(name);
+    if (id >= 0)
+    {
+      start_edit_recipe(id);
+      emit app->recipe_added(id);
+    }
+  }
+
+  void stop_edit_recipe()
+  {
+    if (recipe_id < 0)
+      return;
+    QString name = app->ui->leRecipeTitle->text();
+    QString steps = app->ui->teRecipeSteps->toPlainText();
+    db_set_recipe_name(recipe_id, name);
+    db_set_recipe_steps(recipe_id, steps);
+    reset_recipe_tab();
+    query_refresh(recipes);
+    app->ui->tabs->setCurrentIndex(recipes_tab_idx);
+  }
+
+  void remove_selected_recipes()
+  {
+    auto select = app->ui->recipesView->selectionModel();
+    QList<int> removed = query_remove_ids(select, recipes, "recipes", 0);
+    if (removed.contains(recipe_id))
+      reset_recipe_tab();
+    if (removed.size() > 0)
+      emit app->recipes_removed();
+  }
+
+  int add_food(QString name)
+  {
+    QSqlRecord record;
+    record.append(QSqlField("name", QVariant::String));
+    record.setValue("name", name);
+    if (foods->insertRecord(-1, record))
+    {
+      QModelIndex index = foods->index(foods->rowCount(), 0);
+      int id = index.data().toInt();
+      emit app->food_added(id);
+      return id;
+    }
+    return -1;
+  }
+
+  void remove_selected_foods()
+  {
+    QList<int> removed = table_remove_rows(app->ui->foodsView->selectionModel(), foods, 0);
+    if (removed.size() > 0)
+      emit app->foods_removed();
+  }
+
+  bool add_ingredient(int recipe, QString name)
+  {
+    int food_id = db_food_id(name);
+    if (food_id < 0 && !name.isEmpty())
+    {
+      food_id = add_food(name);
+      if (food_id < 0)
+        return -1;
+    }
+
+    QSqlRecord record;
+    record.append(QSqlField("recipe", QVariant::Int));
+    record.append(QSqlField("food", QVariant::Int));
+    record.setValue("recipe", recipe);
+    record.setValue("food", food_id);
+
+    if (ingredients->insertRecord(-1, record))
+    {
+      QModelIndex index = ingredients->index(ingredients->rowCount(), 0);
+      int id = index.data().toInt();
+      return id;
+    }
+    return -1;
+  }
+
+  void remove_selected_ingredients()
+  {
+    table_remove_rows(app->ui->ingredientsView->selectionModel(), ingredients, 0);
   }
 };
 
@@ -132,136 +242,49 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   ui->ingredientsView->hideColumn(1);
 #endif
 
-  connect(ui->bAddRecipe, &QPushButton::released, this, &App::start_add_recipe);
-  connect(ui->bDeleteRecipe, &QPushButton::released, this, &App::remove_recipes);
-  connect(ui->leRecipeTitle, &QLineEdit::textEdited, this, &App::set_recipe_name);
-  connect(ui->teRecipeSteps, &QPlainTextEdit::textChanged, this, &App::set_recipe_steps);
-  connect(ui->bDoneRecipe, &QPushButton::released, this, &App::stop_edit_recipe);
-  connect(ui->leFood, &QLineEdit::returnPressed, this, &App::add_food);
-  connect(ui->bDeleteFood, &QPushButton::released, this, &App::remove_foods);
-  connect(ui->recipesView, &QTableView::doubleClicked, this, &App::recipe_double_clicked);
-  connect(ui->leRecipeIngredient, &QLineEdit::returnPressed, this, &App::add_ingredient);
-  connect(ui->bDeleteIngredient, &QPushButton::released, this, &App::remove_ingredients);
-
   ui->tabs->setCurrentIndex(recipes_tab_idx);
   ui->recipeTab->setEnabled(false);
+
+  connect(ui->bAddRecipe, &QPushButton::released, this, [this]()
+  {
+    impl->start_add_recipe("Untitled");
+  });
+
+  connect(ui->bDeleteRecipe, &QPushButton::released, this, [this]()
+  {
+    impl->remove_selected_recipes();
+  });
+
+  connect(ui->leFood, &QLineEdit::returnPressed, this, [this]()
+  {
+    if (impl->add_food(ui->leFood->text()) >= 0)
+      ui->leFood->clear();
+  });
+
+  connect(ui->bDeleteFood, &QPushButton::released, this, [this]()
+  {
+    impl->remove_selected_foods();
+  });
+
+  connect(ui->recipesView, &QTableView::doubleClicked, this, [this](const QModelIndex &index)
+  {
+    impl->start_edit_recipe(index.siblingAtColumn(0).data().toInt());
+  });
+
+  connect(ui->leIngredient, &QLineEdit::returnPressed, this, [this]()
+  {
+    if (impl->add_ingredient(impl->recipe_id, ui->leIngredient->text()))
+      ui->leIngredient->clear();
+  });
+
+  connect(ui->bDeleteIngredient, &QPushButton::released, this, [this]()
+  {
+    impl->remove_selected_ingredients();
+  });
 }
 
 App::~App()
 {
   delete ui;
-}
-
-void App::add_food()
-{
-  QString name = ui->leFood->text();
-  if (name.isEmpty())
-    return;
-
-  QSqlRecord record;
-  record.append(QSqlField("name", QVariant::String));
-  record.setValue("name", name);
-
-  if (impl->foods->insertRecord(-1, record))
-    ui->leFood->clear();
-}
-
-void App::remove_foods()
-{
-  table_remove_rows(ui->foodsView->selectionModel(), impl->foods, 0);
-}
-
-void App::remove_recipes()
-{
-  QList<int> removed = query_remove_ids(ui->recipesView->selectionModel(), impl->recipes, "recipes", 0);
-  if (removed.contains(impl->recipe_id))
-    reset_recipe_tab();
-}
-
-void App::set_recipe_name(const QString &name)
-{
-  if (impl->recipe_id >= 0)
-    db_set_recipe_name(impl->recipe_id, name);
-}
-
-void App::set_recipe_steps()
-{
-  QString text = ui->teRecipeSteps->toPlainText();
-  if (impl->recipe_id >= 0)
-    db_set_recipe_steps(impl->recipe_id, text);
-}
-
-void App::reset_recipe_tab()
-{
-  impl->recipe_id = -1;
-  ui->leRecipeTitle->clear();
-  ui->teRecipeSteps->clear();
-  impl->ingredients->setFilter("recipe is null");
-  ui->recipeTab->setEnabled(false);
-}
-
-void App::start_edit_recipe(int id)
-{
-  reset_recipe_tab();
-  ui->leRecipeTitle->setText(db_recipe_name(id));
-  ui->teRecipeSteps->setPlainText(db_recipe_steps(id));
-  impl->ingredients->setFilter(QString("recipe = %1").arg(id));
-  ui->recipeTab->setEnabled(true);
-  impl->recipe_id = id;
-  ui->tabs->setCurrentIndex(recipe_tab_idx);
-}
-
-void App::start_add_recipe()
-{
-  int id = db_add_recipe("Untitled");
-  if (id >= 0)
-  {
-    query_refresh(impl->recipes);
-    start_edit_recipe(id);
-  }
-}
-
-void App::stop_edit_recipe()
-{
-  query_refresh(impl->recipes);
-  reset_recipe_tab();
-  ui->tabs->setCurrentIndex(recipes_tab_idx);
-}
-
-void App::recipe_double_clicked(const QModelIndex &index)
-{
-  start_edit_recipe(index.siblingAtColumn(0).data().toInt());
-}
-
-void App::add_ingredient()
-{
-  if (impl->recipe_id < 0)
-    return;
-
-  QString name = ui->leRecipeIngredient->text();
-  if (name.isEmpty())
-    return;
-
-  int food_id = db_food_id(name);
-  if (food_id < 0)
-  {
-    food_id = db_add_food(name);
-    if (food_id < 0)
-      return;
-  }
-
-  QSqlRecord record;
-  record.append(QSqlField("recipe", QVariant::Int));
-  record.append(QSqlField("food", QVariant::Int));
-  record.setValue("recipe", impl->recipe_id);
-  record.setValue("food", food_id);
-
-  if (impl->ingredients->insertRecord(-1, record))
-    ui->leRecipeIngredient->clear();
-}
-
-void App::remove_ingredients()
-{
-  table_remove_rows(ui->ingredientsView->selectionModel(), impl->ingredients, 0);
 }
 

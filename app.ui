@@ -193,7 +193,7 @@
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
-            <widget class="QLineEdit" name="leRecipeIngredient">
+            <widget class="QLineEdit" name="leIngredient">
              <property name="placeholderText">
               <string>Add: &lt;name&gt;</string>
              </property>

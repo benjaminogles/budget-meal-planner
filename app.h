@@ -15,19 +15,11 @@ class App : public QMainWindow
     App();
     ~App();
 
-  public slots:
-    void add_food();
-    void remove_foods();
-    void remove_recipes();
-    void set_recipe_name(const QString&);
-    void set_recipe_steps();
-    void add_ingredient();
-    void remove_ingredients();
-    void reset_recipe_tab();
-    void start_edit_recipe(int);
-    void start_add_recipe();
-    void stop_edit_recipe();
-    void recipe_double_clicked(const QModelIndex&);
+  signals:
+    void recipe_added(int);
+    void recipes_removed();
+    void food_added(int);
+    void foods_removed();
 
   private:
     Ui::App *ui;
