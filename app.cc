@@ -11,6 +11,7 @@
 #include <QSqlTableModel>
 #include <QStringListModel>
 #include <QCompleter>
+#include <QSqlError>
 
 namespace
 {
@@ -82,7 +83,18 @@ struct App::Impl
     groceries->setTable("groceries");
     groceries->select();
 
-    recipes->setQuery("select id, name from recipes");
+    recipes->setQuery(
+        "select"
+        " r.id,"
+        " r.name,"
+        " r.meals,"
+        " sum(f.price) as total, "
+        " sum(case f.staple when 0 then f.price else 0 end) as fresh "
+        "from recipes r"
+        " left outer join ingredients i on r.id = i.recipe"
+        " left outer join foods f on f.id = i.food "
+        "group by r.id"
+        );
 
     foods->setEditStrategy(QSqlTableModel::OnFieldChange);
     foods->setTable("foods");

@@ -197,7 +197,7 @@ bool db_init(QString src)
     "id integer primary key asc,"
     "name text not null,"
     "planned integer not null default 0,"
-    "meals integer not null default 0,"
+    "meals integer not null default 1,"
     "steps text not null default ''"
     ");";
   if (!query.exec(statement))
@@ -219,8 +219,8 @@ bool db_init(QString src)
   statement =
     "create table if not exists ingredients ("
     "id integer primary key asc,"
-    "recipe integer not null references recipes(id),"
-    "food integer not null references foods(id),"
+    "recipe integer not null references recipes(id) on delete cascade,"
+    "food integer not null references foods(id) on delete cascade,"
     "unit integer references units(id),"
     "quantity real not null default 0"
     ");";
