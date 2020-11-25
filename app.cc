@@ -120,6 +120,7 @@ struct App::Impl
   {
     recipe_id = -1;
     ingredients->setFilter("recipe is null");
+    ingredients->select();
     app->ui->leRecipeTitle->clear();
     app->ui->teRecipeSteps->clear();
     app->ui->recipeTab->setEnabled(false);
