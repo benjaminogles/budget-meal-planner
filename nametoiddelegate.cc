@@ -10,8 +10,15 @@ struct NameToIdDelegate::Impl
   QMap<QString, int> name_to_id;
   QMap<int, QString> id_to_name;
 
-  Impl(QMap<QString, int> name_to_id) : name_to_id(name_to_id)
+  Impl(QMap<QString, int> name_to_id)
   {
+    reset(name_to_id);
+  }
+
+  void reset(QMap<QString, int> source)
+  {
+    name_to_id = source;
+    id_to_name.clear();
     auto i = name_to_id.constBegin();
     while (i != name_to_id.constEnd())
     {
@@ -72,8 +79,7 @@ QString NameToIdDelegate::displayText(const QVariant &value, const QLocale&) con
 }
 
 
-void NameToIdDelegate::addNameIdPair(QString name, int id)
+void NameToIdDelegate::reset(QMap<QString, int> source)
 {
-  impl->name_to_id.insert(name, id);
-  impl->id_to_name.insert(id, name);
+  impl->reset(source);
 }

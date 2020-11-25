@@ -60,7 +60,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <widget class="QLineEdit" name="lineEdit">
+            <widget class="QLineEdit" name="lePlanned">
              <property name="placeholderText">
               <string>Add: &lt;name&gt;</string>
              </property>

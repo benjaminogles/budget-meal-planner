@@ -123,6 +123,15 @@ namespace
       return QVariant();
     return query.value(0);
   }
+
+  QStringList db_field_list(QString table, QString field)
+  {
+    QStringList result;
+    QSqlQuery query(QString("select %1 from %2;").arg(field).arg(table));
+    while (query.next())
+      result.append(query.value(0).toString());
+    return result;
+  }
 }
 
 bool db_init(QString src)
@@ -283,11 +292,12 @@ bool db_set_recipe_steps(int id, QString steps)
 
 QStringList db_food_names()
 {
-  QStringList result;
-  QSqlQuery query("select name from foods;");
-  while (query.next())
-    result.append(query.value(0).toString());
-  return result;
+  return db_field_list("foods", "name");
+}
+
+QStringList db_recipe_names()
+{
+  return db_field_list("recipes", "name");
 }
 
 int db_food_id(QString name)

@@ -15,12 +15,6 @@ class App : public QMainWindow
     App();
     ~App();
 
-  signals:
-    void recipe_added(int);
-    void recipes_removed();
-    void food_added(int);
-    void foods_removed();
-
   private:
     Ui::App *ui;
     struct Impl;
