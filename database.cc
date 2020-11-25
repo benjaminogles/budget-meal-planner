@@ -18,23 +18,6 @@ namespace
     return prepared.exec();
   }
 
-  int db_schema_version()
-  {
-    QSqlQuery query("select value from schema_versions order by value asc limit 1;");
-    if (query.next())
-      return query.value(0).toInt();
-    return -1;
-  }
-
-  bool db_set_schema_version()
-  {
-    QSqlQuery query;
-    if (!query.prepare("insert into schema_versions (value) values (?)"))
-      return false;
-    query.addBindValue(QVariant(schema_version));
-    return query.exec();
-  }
-
   bool db_init_units()
   {
     QString statement;
@@ -81,6 +64,53 @@ namespace
       return false;
 
     return true;
+  }
+
+  QMap<QString, int> db_name_id_map(QString table)
+  {
+    QMap<QString, int> result;
+    QSqlQuery query(QString("select name, id from %1;").arg(table));
+    while (query.next())
+      result.insert(query.value(0).toString(), query.value(1).toInt());
+    return result;
+  }
+
+  int db_schema_version()
+  {
+    QSqlQuery query("select value from schema_versions order by value asc limit 1;");
+    if (query.next())
+      return query.value(0).toInt();
+    return -1;
+  }
+
+  bool db_set_field_by_id(int id, QString table, QString field, QVariant value)
+  {
+    QSqlQuery query;
+    if (!query.prepare(QString("update %1 set %2 = :value where id = :id;").arg(table).arg(field)))
+      return false;
+    query.bindValue(":value", value);
+    query.bindValue(":id", id);
+    return query.exec();
+  }
+
+  int db_id_by_field(QString table, QString field, QVariant value)
+  {
+    QSqlQuery query;
+    if (!query.prepare(QString("select id from %1 where %2 = :value;").arg(table).arg(field)))
+      return -1;
+    query.bindValue(":value", value);
+    if (!query.exec() || !query.next())
+      return -1;
+    return query.value(0).toInt();
+  }
+
+  bool db_set_schema_version()
+  {
+    QSqlQuery query;
+    if (!query.prepare("insert into schema_versions (value) values (?)"))
+      return false;
+    query.addBindValue(QVariant(schema_version));
+    return query.exec();
   }
 
   QVariant db_field_by_id(QString table, QString field, int id)
@@ -205,19 +235,20 @@ bool db_init(QString src)
 
 QMap<QString, int> db_unit_id_map()
 {
-  QMap<QString, int> result;
-  QSqlQuery query("select name, id from units;");
-  while (query.next())
-    result.insert(query.value(0).toString(), query.value(1).toInt());
-  return result;
+  return db_name_id_map("units");
+}
+
+QMap<QString, int> db_food_id_map()
+{
+  return db_name_id_map("foods");
 }
 
 int db_add_recipe(QString name)
 {
   QSqlQuery query;
-  if (!query.prepare("insert into recipes (name) values (?);"))
+  if (!query.prepare("insert into recipes (name) values (:name);"))
     return -1;
-  query.addBindValue(name);
+  query.bindValue(":name", name);
   return query.exec() ? query.lastInsertId().toInt() : -1;
 }
 
@@ -242,22 +273,12 @@ QString db_recipe_steps(int id)
 
 bool db_set_recipe_name(int id, QString name)
 {
-  QSqlQuery query;
-  if (!query.prepare("update recipes set name = :name where id = :id;"))
-    return false;
-  query.bindValue(":name", name);
-  query.bindValue(":id", id);
-  return query.exec();
+  return db_set_field_by_id(id, "recipes", "name", name);
 }
 
 bool db_set_recipe_steps(int id, QString steps)
 {
-  QSqlQuery query;
-  if (!query.prepare("update recipes set steps = :steps where id = :id;"))
-    return false;
-  query.bindValue(":steps", steps);
-  query.bindValue(":id", id);
-  return query.exec();
+  return db_set_field_by_id(id, "recipes", "steps", steps);
 }
 
 QStringList db_food_names()
@@ -269,32 +290,17 @@ QStringList db_food_names()
   return result;
 }
 
-QMap<QString, int> db_food_id_map()
-{
-  QMap<QString, int> result;
-  QSqlQuery query("select name, id from foods;");
-  while (query.next())
-    result.insert(query.value(0).toString(), query.value(1).toInt());
-  return result;
-}
-
 int db_food_id(QString name)
 {
-  QSqlQuery query;
-  if (!query.prepare("select id from foods where name = :name;"))
-    return -1;
-  query.bindValue(":name", name);
-  if (!query.exec() || !query.next())
-    return -1;
-  return query.value(0).toInt();
+  return db_id_by_field("foods", "name", name);
 }
 
 int db_add_food(QString name)
 {
   QSqlQuery query;
-  if (!query.prepare("insert into foods (name) values (?);"))
+  if (!query.prepare("insert into foods (name) values (:name);"))
     return -1;
-  query.addBindValue(name);
+  query.bindValue(":name", name);
   return query.exec() ? query.lastInsertId().toInt() : -1;
 }
 
