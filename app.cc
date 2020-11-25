@@ -114,6 +114,8 @@ struct App::Impl
     app->ui->lePlanned->setCompleter(recipe_completer);
     if (old)
       delete old;
+    auto delegate = qobject_cast<NameToIdDelegate*>(app->ui->plannedView->itemDelegate());
+    delegate->reset(db_recipe_id_map());
   }
 
   void reset_recipe_tab()
@@ -299,6 +301,7 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
 
   ui->plannedView->setModel(impl->planned);
   ui->plannedView->setSelectionMode(QAbstractItemView::NoSelection);
+  ui->plannedView->setItemDelegate(new NameToIdDelegate(db_recipe_id_map(), this));
 
   ui->groceriesView->setModel(impl->groceries);
   ui->groceriesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -407,6 +410,11 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   connect(ui->bDeleteGrocery, &QPushButton::released, this, [this]()
   {
     impl->remove_selected_groceries();
+  });
+
+  connect(ui->plannedView, &QListView::doubleClicked, this, [this](const QModelIndex &index)
+  {
+    impl->start_edit_recipe(index.siblingAtColumn(0).data().toInt());
   });
 }
 

@@ -252,6 +252,11 @@ QMap<QString, int> db_food_id_map()
   return db_name_id_map("foods");
 }
 
+QMap<QString, int> db_recipe_id_map()
+{
+  return db_name_id_map("recipes");
+}
+
 int db_add_recipe(QString name)
 {
   QSqlQuery query;

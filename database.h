@@ -10,6 +10,7 @@ bool db_init(QString);
 
 QMap<QString, int> db_unit_id_map();
 QMap<QString, int> db_food_id_map();
+QMap<QString, int> db_recipe_id_map();
 
 QStringList db_food_names();
 QStringList db_recipe_names();
