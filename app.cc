@@ -255,6 +255,11 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
     impl->remove_selected_recipes();
   });
 
+  connect(ui->bDoneRecipe, &QPushButton::released, this, [this]()
+  {
+    impl->stop_edit_recipe();
+  });
+
   connect(ui->leFood, &QLineEdit::returnPressed, this, [this]()
   {
     if (impl->add_food(ui->leFood->text()) >= 0)
