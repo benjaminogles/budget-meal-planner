@@ -91,6 +91,10 @@ struct App::Impl
     ingredients->setEditStrategy(QSqlTableModel::OnFieldChange);
     ingredients->setTable("ingredients");
     ingredients->setFilter("recipe is null");
+
+    groceries->setEditStrategy(QSqlTableModel::OnFieldChange);
+    groceries->setTable("groceries");
+    groceries->select();
   }
 
   ~Impl()
@@ -177,9 +181,12 @@ struct App::Impl
     food_completer->setCompletionMode(QCompleter::InlineCompletion);
     food_completer->setCaseSensitivity(Qt::CaseInsensitive);
     app->ui->leIngredient->setCompleter(food_completer);
+    app->ui->leGrocery->setCompleter(food_completer);
     if (old)
       delete old;
     auto delegate = qobject_cast<NameToIdDelegate*>(app->ui->ingredientsView->itemDelegateForColumn(2));
+    delegate->reset(db_food_id_map());
+    delegate = qobject_cast<NameToIdDelegate*>(app->ui->groceriesView->itemDelegateForColumn(1));
     delegate->reset(db_food_id_map());
   }
 
@@ -232,6 +239,57 @@ struct App::Impl
     if (removed.size() > 0)
       ingredients->select();
   }
+
+  bool add_grocery(QString name)
+  {
+    int food_id = db_food_id(name);
+    if (food_id < 0)
+    {
+      if (!add_food(name))
+        return false;
+      food_id = db_food_id(name);
+      if (food_id < 0)
+        return false;
+    }
+
+    QSqlRecord record;
+    record.append(QSqlField("food", QVariant::Int));
+    record.setValue("food", food_id);
+    return groceries->insertRecord(-1, record);
+  }
+
+  void remove_selected_groceries()
+  {
+    QList<int> removed = table_remove_rows(app->ui->groceriesView->selectionModel(), groceries, 0);
+    if (removed.size() > 0)
+      groceries->select();
+  }
+
+  void reset_groceries()
+  {
+    db_clear_groceries();
+    db_generate_groceries();
+    groceries->select();
+  }
+
+  bool add_planned(QString name)
+  {
+    int recipe_id = db_recipe_id(name);
+    if (recipe_id < 0)
+      return false;
+    if (db_add_planned(recipe_id))
+    {
+      query_refresh(planned);
+      return true;
+    }
+    return false;
+  }
+
+  void clear_planned()
+  {
+    db_clear_planned();
+    query_refresh(planned);
+  }
 };
 
 App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
@@ -239,13 +297,13 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   ui->setupUi(this);
 
   ui->plannedView->setModel(impl->planned);
-  ui->plannedView->setSelectionMode(QAbstractItemView::MultiSelection);
-  ui->plannedView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  ui->plannedView->setSelectionMode(QAbstractItemView::NoSelection);
 
   ui->groceriesView->setModel(impl->groceries);
   ui->groceriesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   ui->groceriesView->setSelectionMode(QAbstractItemView::MultiSelection);
   ui->groceriesView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  ui->groceriesView->setItemDelegateForColumn(1, new NameToIdDelegate(db_food_id_map(), this));
 
   ui->recipesView->setModel(impl->recipes);
   ui->recipesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -321,6 +379,33 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   connect(ui->bDeleteIngredient, &QPushButton::released, this, [this]()
   {
     impl->remove_selected_ingredients();
+  });
+
+  connect(ui->leGrocery, &QLineEdit::returnPressed, this, [this]()
+  {
+    if (impl->add_grocery(ui->leGrocery->text()))
+      ui->leGrocery->clear();
+  });
+
+  connect(ui->lePlanned, &QLineEdit::returnPressed, this, [this]()
+  {
+    if (impl->add_planned(ui->lePlanned->text()))
+      ui->lePlanned->clear();
+  });
+
+  connect(ui->bClearPlanned, &QPushButton::released, this, [this]()
+  {
+    impl->clear_planned();
+  });
+
+  connect(ui->bResetGroceries, &QPushButton::released, this, [this]()
+  {
+    impl->reset_groceries();
+  });
+
+  connect(ui->bDeleteGrocery, &QPushButton::released, this, [this]()
+  {
+    impl->remove_selected_groceries();
   });
 }
 

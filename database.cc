@@ -305,6 +305,11 @@ int db_food_id(QString name)
   return db_id_by_field("foods", "name", name);
 }
 
+int db_recipe_id(QString name)
+{
+  return db_id_by_field("recipes", "name", name);
+}
+
 int db_add_food(QString name)
 {
   QSqlQuery query;
@@ -314,3 +319,26 @@ int db_add_food(QString name)
   return query.exec() ? query.lastInsertId().toInt() : -1;
 }
 
+void db_clear_groceries()
+{
+  QSqlQuery query("delete from groceries;");
+}
+
+void db_generate_groceries()
+{
+  QSqlQuery query("insert into groceries (food) select f.id from recipes r join ingredients i on r.id = i.recipe join foods f on f.id = i.food where r.planned = 1;");
+}
+
+bool db_add_planned(int recipe)
+{
+  QSqlQuery query;
+  if (!query.prepare("update recipes set planned = 1 where id = :id"))
+    return false;
+  query.bindValue(":id", recipe);
+  return query.exec();
+}
+
+void db_clear_planned()
+{
+  QSqlQuery query("update recipes set planned = 0;");
+}

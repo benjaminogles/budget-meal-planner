@@ -16,6 +16,7 @@ QStringList db_recipe_names();
 
 int db_add_recipe(QString);
 int db_add_food(QString);
+bool db_add_planned(int);
 
 bool db_remove_id(QString, int);
 
@@ -23,8 +24,14 @@ QString db_recipe_name(int);
 QString db_recipe_steps(int);
 
 int db_food_id(QString);
+int db_recipe_id(QString);
 
 bool db_set_recipe_name(int, QString);
 bool db_set_recipe_steps(int, QString);
+
+void db_clear_groceries();
+void db_clear_planned();
+
+void db_generate_groceries();
 
 #endif

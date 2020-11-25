@@ -73,13 +73,6 @@
             <widget class="QWidget" name="widget_4" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
-               <widget class="QPushButton" name="bDeletePlanned">
-                <property name="text">
-                 <string>Delete</string>
-                </property>
-               </widget>
-              </item>
-              <item>
                <widget class="QPushButton" name="bClearPlanned">
                 <property name="text">
                  <string>Clear</string>
@@ -101,7 +94,7 @@
            <item>
             <widget class="QLineEdit" name="leGrocery">
              <property name="placeholderText">
-              <string>Add: &lt;quantity&gt; [&lt;unit&gt;] &lt;name&gt;</string>
+              <string>Add: &lt;name&gt;</string>
              </property>
             </widget>
            </item>
@@ -119,9 +112,9 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="bClearGroceries">
+               <widget class="QPushButton" name="bDeleteGrocery">
                 <property name="text">
-                 <string>Clear</string>
+                 <string>Delete</string>
                 </property>
                </widget>
               </item>
