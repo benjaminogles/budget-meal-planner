@@ -1,11 +1,11 @@
 
+#include "appinit.h"
 #include "app.h"
-#include "tabs.h"
 
 int main(int argc, char **argv)
 {
-  App application(argc, argv);
-  Tabs tabs;
-  tabs.show();
-  return application.exec();
+  AppInit init(argc, argv);
+  App app;
+  app.show();
+  return init.exec();
 }

@@ -8,16 +8,16 @@ QT += core widgets sql
 SOURCES = \
   main.cc \
   database.cc \
+  appinit.cc \
   app.cc \
-  tabs.cc \
   nametoiddelegate.cc
 
 HEADERS = \
   database.h \
+  appinit.h \
   app.h \
-  tabs.h \
   nametoiddelegate.h
 
 FORMS = \
-  tabs.ui
+  app.ui
 
