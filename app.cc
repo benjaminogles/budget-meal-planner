@@ -17,7 +17,7 @@
 
 namespace
 {
-  const int recipes_tab_idx = 0;
+  const int groceries_tab_idx = 0;
   const int recipe_tab_idx = 3;
 
   bool confirmed(QWidget *parent, QString description)
@@ -195,7 +195,7 @@ struct App::Impl
     reset_recipe_tab();
     query_refresh(recipes);
     reset_recipe_completer();
-    app->ui->tabs->setCurrentIndex(recipes_tab_idx);
+    app->ui->tabs->setCurrentIndex(groceries_tab_idx);
   }
 
   void remove_selected_recipes()
@@ -370,7 +370,7 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   ui->foodsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   ui->foodsView->setSelectionMode(QAbstractItemView::MultiSelection);
   ui->foodsView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  ui->foodsView->setItemDelegateForColumn(4, impl->currency_delegate);
+  ui->foodsView->setItemDelegateForColumn(3, impl->currency_delegate);
 
   ui->ingredientsView->setModel(impl->ingredients);
   ui->ingredientsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -395,7 +395,7 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   ui->ingredientsView->hideColumn(1);
 #endif
 
-  ui->tabs->setCurrentIndex(recipes_tab_idx);
+  ui->tabs->setCurrentIndex(groceries_tab_idx);
   ui->recipeTab->setEnabled(false);
 
   impl->reset_food_completer();
