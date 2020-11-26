@@ -427,6 +427,11 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   {
     impl->start_edit_recipe(index.siblingAtColumn(0).data().toInt());
   });
+
+  connect(ui->bRefreshRecipes, &QPushButton::released, this, [this]()
+  {
+    query_refresh(impl->recipes);
+  });
 }
 
 App::~App()

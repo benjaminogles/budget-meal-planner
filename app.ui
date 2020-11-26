@@ -18,36 +18,8 @@
     <item>
      <widget class="QTabWidget" name="tabs">
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="recipesTab">
-       <attribute name="title">
-        <string>Recipes</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
-         <widget class="QTableView" name="recipesView"/>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
-          <item>
-           <widget class="QPushButton" name="bAddRecipe">
-            <property name="text">
-             <string>Add</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="bDeleteRecipe">
-            <property name="text">
-             <string>Delete</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="groceriesTab">
        <attribute name="title">
         <string>Groceries</string>
@@ -72,6 +44,13 @@
            <item>
             <widget class="QWidget" name="widget_4" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QPushButton" name="bResetGroceries">
+                <property name="text">
+                 <string>Regenerate</string>
+                </property>
+               </widget>
+              </item>
               <item>
                <widget class="QPushButton" name="bClearPlanned">
                 <property name="text">
@@ -105,13 +84,6 @@
             <widget class="QWidget" name="widget_3" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QPushButton" name="bResetGroceries">
-                <property name="text">
-                 <string>Reset</string>
-                </property>
-               </widget>
-              </item>
-              <item>
                <widget class="QPushButton" name="bDeleteGrocery">
                 <property name="text">
                  <string>Delete</string>
@@ -123,6 +95,41 @@
            </item>
           </layout>
          </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="recipesTab">
+       <attribute name="title">
+        <string>Recipes</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QTableView" name="recipesView"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QPushButton" name="bAddRecipe">
+            <property name="text">
+             <string>Add</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="bDeleteRecipe">
+            <property name="text">
+             <string>Delete</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="bRefreshRecipes">
+            <property name="text">
+             <string>Refresh</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
