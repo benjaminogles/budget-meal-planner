@@ -1,6 +1,8 @@
 
 # Budget Meal Planner
 
+![Screenshot](/groceries-tab.png)
+
 This is a simple, offline desktop app for storing recipes, creating meal plans and generating grocery lists with your budget in mind.
 Grocery lists are generated automatically from the meal plan.
 It displays the price of recipes and the grocery list according to price data you enter for each type of food.
