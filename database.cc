@@ -4,6 +4,7 @@
 #include <QSqlDatabase>
 #include <QVariant>
 #include <QSqlQuery>
+#include <QSqlError>
 
 namespace
 {
@@ -155,8 +156,7 @@ bool db_init(QString src)
     "name text not null,"
     "staple integer not null default 0,"
     "price real not null default 0,"
-    "unit integer references units(id),"
-    "quantity real not null default 0,"
+    "quantity real not null default 1,"
     "constraint food_name_unique unique (name)"
     ");";
   if (!query.exec(statement))
@@ -177,7 +177,7 @@ bool db_init(QString src)
     "create table if not exists groceries ("
     "id integer primary key asc,"
     "food integer not null references foods(id),"
-    "quantity real not null default 1"
+    "quantity real not null"
     ");";
   if (!query.exec(statement))
     return false;
@@ -277,7 +277,12 @@ void db_clear_groceries()
 
 void db_generate_groceries()
 {
-  QSqlQuery query("insert into groceries (food) select f.id from recipes r join ingredients i on r.id = i.recipe join foods f on f.id = i.food where r.planned = 1;");
+  QSqlQuery query(
+      "insert into groceries (food, quantity) "
+      "select f.id, (case f.staple when 0 then sum(f.quantity) else 1 end) "
+      "from recipes r join ingredients i on r.id = i.recipe join foods f on f.id = i.food where r.planned = 1 "
+      "group by f.id;"
+      );
 }
 
 bool db_add_planned(int recipe)

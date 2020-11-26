@@ -332,7 +332,6 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   ui->foodsView->setSelectionMode(QAbstractItemView::MultiSelection);
   ui->foodsView->setSelectionBehavior(QAbstractItemView::SelectRows);
   ui->foodsView->setSortingEnabled(true);
-  ui->foodsView->setItemDelegateForColumn(4, new NameToIdDelegate(db_unit_id_map(), this));
 
   ui->ingredientsView->setModel(impl->ingredients);
   ui->ingredientsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
