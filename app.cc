@@ -100,7 +100,6 @@ struct App::Impl
         "select"
         " r.id,"
         " r.name,"
-        " r.meals,"
         " sum(case f.staple when 1 then f.price else 0 end) as staples, "
         " sum(case f.staple when 0 then i.quantity * f.price else 0 end) as fresh "
         "from recipes r"
