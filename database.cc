@@ -197,7 +197,7 @@ bool db_init(QString src)
     "id integer primary key asc,"
     "name text not null,"
     "planned integer not null default 0,"
-    "meals integer not null default 1,"
+    "meals real not null default 1,"
     "steps text not null default ''"
     ");";
   if (!query.exec(statement))
