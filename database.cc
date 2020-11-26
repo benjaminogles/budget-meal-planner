@@ -10,14 +10,6 @@ namespace
   int schema_version = 0;
   bool initialized = false;
 
-  bool db_add_conversion(QSqlQuery prepared, QString from, QString to, double factor)
-  {
-    prepared.bindValue(":from_unit", QVariant(from));
-    prepared.bindValue(":to_unit", QVariant(to));
-    prepared.bindValue(":factor", QVariant(factor));
-    return prepared.exec();
-  }
-
   bool db_init_units()
   {
     QString statement;
@@ -32,37 +24,10 @@ namespace
       "('quart'),"
       "('pint'),"
       "('gallon'),"
-      "('milliliter'),"
-      "('liter'),"
       "('ounce'),"
-      "('pound'),"
-      "('gram')"
-      ";";
+      "('pound');";
     if (!query.exec(statement))
       return false;
-
-    statement =
-      "insert into conversions (from_unit, to_unit, factor) values ("
-      "(select id from units where name = :from_unit),"
-      "(select id from units where name = :to_unit),"
-      ":factor"
-      ");";
-    if (!query.prepare(statement))
-      return false;
-
-    if (!db_add_conversion(query, "teaspoon", "tablespoon", 3.0))
-      return false;
-    if (!db_add_conversion(query, "tablespoon", "teaspoon", 0.333))
-      return false;
-    if (!db_add_conversion(query, "tablespoon", "cup", 16.231))
-      return false;
-    if (!db_add_conversion(query, "cup", "tablespoon", 0.0616))
-      return false;
-    if (!db_add_conversion(query, "cup", "quart", 4.0))
-      return false;
-    if (!db_add_conversion(query, "quart", "cup", 0.25))
-      return false;
-
     return true;
   }
 
@@ -169,25 +134,6 @@ bool db_init(QString src)
     "id integer primary key asc,"
     "name text not null,"
     "constraint unit_name_unique unique (name)"
-    ");";
-  if (!query.exec(statement))
-    return false;
-
-  statement =
-    "create table if not exists unit_aliases ("
-    "id integer primary key asc,"
-    "unit integer not null references units(id),"
-    "alias text not null"
-    ");";
-  if (!query.exec(statement))
-    return false;
-
-  statement =
-    "create table if not exists conversions ("
-    "id integer primary key asc,"
-    "from_unit integer not null references units(id),"
-    "to_unit integer not null references units(id),"
-    "factor real not null default 1"
     ");";
   if (!query.exec(statement))
     return false;
