@@ -382,9 +382,9 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   ui->estimatesView->setModel(impl->estimates);
   ui->estimatesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   ui->estimatesView->setSelectionMode(QAbstractItemView::NoSelection);
-  ui->foodsView->setItemDelegateForColumn(0, impl->currency_delegate);
-  ui->foodsView->setItemDelegateForColumn(1, impl->currency_delegate);
-  ui->foodsView->setItemDelegateForColumn(2, impl->currency_delegate);
+  ui->estimatesView->setItemDelegateForColumn(0, impl->currency_delegate);
+  ui->estimatesView->setItemDelegateForColumn(1, impl->currency_delegate);
+  ui->estimatesView->setItemDelegateForColumn(2, impl->currency_delegate);
 
 #ifdef QT_NO_DEBUG
   ui->recipesView->hideColumn(0);
