@@ -12,11 +12,19 @@
 #include <QStringListModel>
 #include <QCompleter>
 #include <QSqlError>
+#include <QMessageBox>
 
 namespace
 {
   const int recipes_tab_idx = 0;
   const int recipe_tab_idx = 3;
+
+  bool confirmed(QWidget *parent, QString description)
+  {
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(parent, description, "Are you sure?", QMessageBox::Yes|QMessageBox::No);
+    return reply == QMessageBox::Yes;
+  }
 
   QList<int> table_remove_rows(QItemSelectionModel *select, QSqlTableModel *model, int id_column)
   {
@@ -385,12 +393,14 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
 
   connect(ui->bAddRecipe, &QPushButton::released, this, [this]()
   {
-    impl->start_add_recipe("Untitled");
+    if (impl->recipe_id < 0 || confirmed(this, "Add New Recipe (Abandon Current Edit)"))
+      impl->start_add_recipe("Untitled");
   });
 
   connect(ui->bDeleteRecipe, &QPushButton::released, this, [this]()
   {
-    impl->remove_selected_recipes();
+    if (confirmed(this, "Delete Selected Recipes"))
+      impl->remove_selected_recipes();
   });
 
   connect(ui->bDoneRecipe, &QPushButton::released, this, [this]()
@@ -406,12 +416,14 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
 
   connect(ui->bDeleteFood, &QPushButton::released, this, [this]()
   {
-    impl->remove_selected_foods();
+    if (confirmed(this, "Delete Selected Foods"))
+      impl->remove_selected_foods();
   });
 
   connect(ui->recipesView, &QTableView::doubleClicked, this, [this](const QModelIndex &index)
   {
-    impl->start_edit_recipe(index.siblingAtColumn(0).data().toInt());
+    if (impl->recipe_id < 0 || confirmed(this, "Edit Recipe (Abandon Current Edit)"))
+      impl->start_edit_recipe(index.siblingAtColumn(0).data().toInt());
   });
 
   connect(ui->leIngredient, &QLineEdit::returnPressed, this, [this]()
@@ -422,7 +434,8 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
 
   connect(ui->bDeleteIngredient, &QPushButton::released, this, [this]()
   {
-    impl->remove_selected_ingredients();
+    if (confirmed(this, "Remove Selected Ingredients"))
+      impl->remove_selected_ingredients();
   });
 
   connect(ui->leGrocery, &QLineEdit::returnPressed, this, [this]()
@@ -439,7 +452,8 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
 
   connect(ui->bClearPlanned, &QPushButton::released, this, [this]()
   {
-    impl->clear_planned();
+    if (confirmed(this, "Un-Plan All"))
+      impl->clear_planned();
   });
 
   connect(ui->bRegeneratePlanned, &QPushButton::released, this, [this]()
@@ -449,12 +463,14 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
 
   connect(ui->bDeleteGrocery, &QPushButton::released, this, [this]()
   {
-    impl->remove_selected_groceries();
+    if (confirmed(this, "Remove Selected Groceries"))
+      impl->remove_selected_groceries();
   });
 
   connect(ui->plannedView, &QListView::doubleClicked, this, [this](const QModelIndex &index)
   {
-    impl->start_edit_recipe(index.siblingAtColumn(0).data().toInt());
+    if (impl->recipe_id < 0 || confirmed(this, "Edit Recipe (Abandon Current Edit)"))
+      impl->start_edit_recipe(index.siblingAtColumn(0).data().toInt());
   });
 
   connect(ui->bRefreshRecipes, &QPushButton::released, this, [this]()
