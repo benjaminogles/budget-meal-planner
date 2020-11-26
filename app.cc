@@ -330,13 +330,11 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   ui->recipesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   ui->recipesView->setSelectionMode(QAbstractItemView::MultiSelection);
   ui->recipesView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  ui->recipesView->setSortingEnabled(true);
 
   ui->foodsView->setModel(impl->foods);
   ui->foodsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   ui->foodsView->setSelectionMode(QAbstractItemView::MultiSelection);
   ui->foodsView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  ui->foodsView->setSortingEnabled(true);
 
   ui->ingredientsView->setModel(impl->ingredients);
   ui->ingredientsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
