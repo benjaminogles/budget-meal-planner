@@ -156,7 +156,6 @@ bool db_init(QString src)
     "name text not null,"
     "staple integer not null default 0,"
     "price real not null default 0,"
-    "quantity real not null default 1,"
     "constraint food_name_unique unique (name)"
     ");";
   if (!query.exec(statement))
@@ -280,7 +279,7 @@ void db_generate_planned_groceries()
 {
   QSqlQuery query(
       "insert into groceries (generated, food, quantity) "
-      "select 1, f.id, (case f.staple when 0 then sum(f.quantity) else 1 end) "
+      "select 1, f.id, (case f.staple when 0 then sum(i.quantity) else 1 end) "
       "from recipes r join ingredients i on r.id = i.recipe join foods f on f.id = i.food where r.planned = 1 "
       "group by f.id;"
       );
