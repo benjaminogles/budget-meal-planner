@@ -177,7 +177,8 @@ bool db_init(QString src)
     "create table if not exists groceries ("
     "id integer primary key asc,"
     "food integer not null references foods(id),"
-    "quantity real not null"
+    "quantity real not null,"
+    "generated integer not null default 0"
     ");";
   if (!query.exec(statement))
     return false;
@@ -270,16 +271,16 @@ int db_add_food(QString name)
   return query.exec() ? query.lastInsertId().toInt() : -1;
 }
 
-void db_clear_groceries()
+void db_clear_planned_groceries()
 {
-  QSqlQuery query("delete from groceries;");
+  QSqlQuery query("delete from groceries where generated = 1;");
 }
 
-void db_generate_groceries()
+void db_generate_planned_groceries()
 {
   QSqlQuery query(
-      "insert into groceries (food, quantity) "
-      "select f.id, (case f.staple when 0 then sum(f.quantity) else 1 end) "
+      "insert into groceries (generated, food, quantity) "
+      "select 1, f.id, (case f.staple when 0 then sum(f.quantity) else 1 end) "
       "from recipes r join ingredients i on r.id = i.recipe join foods f on f.id = i.food where r.planned = 1 "
       "group by f.id;"
       );

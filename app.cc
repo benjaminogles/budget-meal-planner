@@ -269,7 +269,9 @@ struct App::Impl
 
     QSqlRecord record;
     record.append(QSqlField("food", QVariant::Int));
+    record.append(QSqlField("quantity", QVariant::Double));
     record.setValue("food", food_id);
+    record.setValue("quantity", 1.0);
     return groceries->insertRecord(-1, record);
   }
 
@@ -280,10 +282,10 @@ struct App::Impl
       groceries->select();
   }
 
-  void reset_groceries()
+  void regenerate_planned_groceries()
   {
-    db_clear_groceries();
-    db_generate_groceries();
+    db_clear_planned_groceries();
+    db_generate_planned_groceries();
     groceries->select();
   }
 
@@ -295,6 +297,7 @@ struct App::Impl
     if (db_add_planned(recipe_id))
     {
       query_refresh(planned);
+      regenerate_planned_groceries();
       return true;
     }
     return false;
@@ -302,6 +305,8 @@ struct App::Impl
 
   void clear_planned()
   {
+    db_clear_planned_groceries();
+    groceries->select();
     db_clear_planned();
     query_refresh(planned);
   }
@@ -343,6 +348,7 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
 #ifdef QT_NO_DEBUG
   ui->recipesView->hideColumn(0);
   ui->groceriesView->hideColumn(0);
+  ui->groceriesView->hideColumn(3);
   ui->foodsView->hideColumn(0);
   ui->ingredientsView->hideColumn(0);
   ui->ingredientsView->hideColumn(1);
@@ -413,9 +419,9 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
     impl->clear_planned();
   });
 
-  connect(ui->bResetGroceries, &QPushButton::released, this, [this]()
+  connect(ui->bRegeneratePlanned, &QPushButton::released, this, [this]()
   {
-    impl->reset_groceries();
+    impl->regenerate_planned_groceries();
   });
 
   connect(ui->bDeleteGrocery, &QPushButton::released, this, [this]()

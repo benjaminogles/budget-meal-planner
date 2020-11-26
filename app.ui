@@ -45,7 +45,7 @@
             <widget class="QWidget" name="widget_4" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
-               <widget class="QPushButton" name="bResetGroceries">
+               <widget class="QPushButton" name="bRegeneratePlanned">
                 <property name="text">
                  <string>Regenerate</string>
                 </property>

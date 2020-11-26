@@ -30,9 +30,9 @@ int db_recipe_id(QString);
 bool db_set_recipe_name(int, QString);
 bool db_set_recipe_steps(int, QString);
 
-void db_clear_groceries();
 void db_clear_planned();
+void db_clear_planned_groceries();
 
-void db_generate_groceries();
+void db_generate_planned_groceries();
 
 #endif
