@@ -3,6 +3,7 @@
 #include "ui_app.h"
 #include "database.h"
 #include "nametoiddelegate.h"
+#include "currencydelegate.h"
 
 #include <QSqlField>
 #include <QSqlRecord>
@@ -74,6 +75,7 @@ struct App::Impl
   QSqlTableModel *foods;
   QSqlTableModel *ingredients;
   QSqlQueryModel *estimates;
+  CurrencyDelegate *currency_delegate;
   QCompleter *food_completer = nullptr;
   QCompleter *recipe_completer = nullptr;
   int recipe_id = -1;
@@ -85,7 +87,8 @@ struct App::Impl
     recipes(new QSqlQueryModel(app)),
     foods(new QSqlTableModel(app)),
     ingredients(new QSqlTableModel(app)),
-    estimates(new QSqlQueryModel(app))
+    estimates(new QSqlQueryModel(app)),
+    currency_delegate(new CurrencyDelegate(app))
   {
     planned->setQuery("select id, name from recipes where planned != 0");
 
@@ -359,11 +362,15 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   ui->recipesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   ui->recipesView->setSelectionMode(QAbstractItemView::MultiSelection);
   ui->recipesView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  ui->recipesView->setItemDelegateForColumn(3, impl->currency_delegate);
+  ui->recipesView->setItemDelegateForColumn(4, impl->currency_delegate);
+  ui->recipesView->setItemDelegateForColumn(5, impl->currency_delegate);
 
   ui->foodsView->setModel(impl->foods);
   ui->foodsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   ui->foodsView->setSelectionMode(QAbstractItemView::MultiSelection);
   ui->foodsView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  ui->foodsView->setItemDelegateForColumn(4, impl->currency_delegate);
 
   ui->ingredientsView->setModel(impl->ingredients);
   ui->ingredientsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -375,6 +382,9 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   ui->estimatesView->setModel(impl->estimates);
   ui->estimatesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   ui->estimatesView->setSelectionMode(QAbstractItemView::NoSelection);
+  ui->foodsView->setItemDelegateForColumn(0, impl->currency_delegate);
+  ui->foodsView->setItemDelegateForColumn(1, impl->currency_delegate);
+  ui->foodsView->setItemDelegateForColumn(2, impl->currency_delegate);
 
 #ifdef QT_NO_DEBUG
   ui->recipesView->hideColumn(0);

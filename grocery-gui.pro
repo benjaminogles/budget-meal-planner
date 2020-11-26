@@ -10,13 +10,15 @@ SOURCES = \
   database.cc \
   appinit.cc \
   app.cc \
-  nametoiddelegate.cc
+  nametoiddelegate.cc \
+  currencydelegate.cc
 
 HEADERS = \
   database.h \
   appinit.h \
   app.h \
-  nametoiddelegate.h
+  nametoiddelegate.h \
+  currencydelegate.h
 
 FORMS = \
   app.ui
