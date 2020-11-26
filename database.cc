@@ -114,7 +114,7 @@ bool db_init(QString src)
   if (!db.open())
     return false;
 
-  QSqlQuery query;
+  QSqlQuery query("pragma foreign_keys = on;");
   QString statement;
 
   statement = 
