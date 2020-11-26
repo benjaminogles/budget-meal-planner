@@ -24,38 +24,76 @@
        <attribute name="title">
         <string>Groceries</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QGroupBox" name="groupBox">
-          <property name="title">
-           <string>Planned Recipes</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+         <widget class="QWidget" name="widget_3" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
-            <widget class="QLineEdit" name="lePlanned">
-             <property name="placeholderText">
-              <string>Add: &lt;name&gt;</string>
+            <widget class="QGroupBox" name="groupBox_2">
+             <property name="title">
+              <string>Planned Recipes</string>
              </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QListView" name="plannedView"/>
-           </item>
-           <item>
-            <widget class="QWidget" name="widget_4" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
-               <widget class="QPushButton" name="bRegeneratePlanned">
-                <property name="text">
-                 <string>Regenerate</string>
+               <widget class="QLineEdit" name="lePlanned">
+                <property name="placeholderText">
+                 <string>Add: &lt;name&gt;</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="bClearPlanned">
-                <property name="text">
-                 <string>Clear</string>
+               <widget class="QListView" name="plannedView"/>
+              </item>
+              <item>
+               <widget class="QWidget" name="widget_4" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <item>
+                  <widget class="QPushButton" name="bRegeneratePlanned">
+                   <property name="text">
+                    <string>Regenerate</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="bClearPlanned">
+                   <property name="text">
+                    <string>Clear</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="title">
+              <string>Generated List</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_8">
+              <item>
+               <widget class="QLineEdit" name="leGrocery">
+                <property name="placeholderText">
+                 <string>Add: &lt;name&gt;</string>
                 </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QTableView" name="groceriesView"/>
+              </item>
+              <item>
+               <widget class="QWidget" name="widget_5" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                 <item>
+                  <widget class="QPushButton" name="bDeleteGrocery">
+                   <property name="text">
+                    <string>Delete</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
              </layout>
@@ -65,33 +103,19 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_2">
-          <property name="title">
-           <string>Generated List</string>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>100</height>
+           </size>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="title">
+           <string>Estimated Prices</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>
-            <widget class="QLineEdit" name="leGrocery">
-             <property name="placeholderText">
-              <string>Add: &lt;name&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QTableView" name="groceriesView"/>
-           </item>
-           <item>
-            <widget class="QWidget" name="widget_3" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
-              <item>
-               <widget class="QPushButton" name="bDeleteGrocery">
-                <property name="text">
-                 <string>Delete</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
+            <widget class="QTableView" name="estimatesView"/>
            </item>
           </layout>
          </widget>

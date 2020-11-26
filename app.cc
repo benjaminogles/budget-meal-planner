@@ -65,6 +65,7 @@ struct App::Impl
   QSqlQueryModel *recipes;
   QSqlTableModel *foods;
   QSqlTableModel *ingredients;
+  QSqlQueryModel *estimates;
   QCompleter *food_completer = nullptr;
   QCompleter *recipe_completer = nullptr;
   int recipe_id = -1;
@@ -75,7 +76,8 @@ struct App::Impl
     groceries(new QSqlTableModel(app)),
     recipes(new QSqlQueryModel(app)),
     foods(new QSqlTableModel(app)),
-    ingredients(new QSqlTableModel(app))
+    ingredients(new QSqlTableModel(app)),
+    estimates(new QSqlQueryModel(app))
   {
     planned->setQuery("select id, name from recipes where planned != 0");
 
@@ -89,6 +91,7 @@ struct App::Impl
         " r.name,"
         " r.meals,"
         " sum(f.price) as total, "
+        " sum(case f.staple when 1 then f.price else 0 end) as staples, "
         " sum(case f.staple when 0 then f.price else 0 end) as fresh "
         "from recipes r"
         " left outer join ingredients i on r.id = i.recipe"
@@ -107,6 +110,14 @@ struct App::Impl
     groceries->setEditStrategy(QSqlTableModel::OnFieldChange);
     groceries->setTable("groceries");
     groceries->select();
+
+    estimates->setQuery(
+        "select"
+        " sum(g.quantity * f.price) as total,"
+        " sum(case f.staple when 1 then (g.quantity * f.price) else 0 end) as staples, "
+        " sum(case f.staple when 0 then (g.quantity * f.price) else 0 end) as fresh "
+        "from groceries g join foods f on f.id = g.food"
+        );
   }
 
   ~Impl()
@@ -272,14 +283,22 @@ struct App::Impl
     record.append(QSqlField("quantity", QVariant::Double));
     record.setValue("food", food_id);
     record.setValue("quantity", 1.0);
-    return groceries->insertRecord(-1, record);
+    if( groceries->insertRecord(-1, record))
+    {
+      query_refresh(estimates);
+      return true;
+    }
+    return false;
   }
 
   void remove_selected_groceries()
   {
     QList<int> removed = table_remove_rows(app->ui->groceriesView->selectionModel(), groceries, 0);
     if (removed.size() > 0)
+    {
       groceries->select();
+      query_refresh(estimates);
+    }
   }
 
   void regenerate_planned_groceries()
@@ -287,6 +306,7 @@ struct App::Impl
     db_clear_planned_groceries();
     db_generate_planned_groceries();
     groceries->select();
+    query_refresh(estimates);
   }
 
   bool add_planned(QString name)
@@ -309,6 +329,7 @@ struct App::Impl
     groceries->select();
     db_clear_planned();
     query_refresh(planned);
+    query_refresh(estimates);
   }
 };
 
@@ -342,6 +363,10 @@ App::App() : ui(new Ui::App), impl(std::make_unique<Impl>(this))
   ui->ingredientsView->setSelectionBehavior(QAbstractItemView::SelectRows);
   ui->ingredientsView->setItemDelegateForColumn(2, new NameToIdDelegate(db_food_id_map(), this));
   ui->ingredientsView->setItemDelegateForColumn(3, new NameToIdDelegate(db_unit_id_map(), this));
+
+  ui->estimatesView->setModel(impl->estimates);
+  ui->estimatesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  ui->estimatesView->setSelectionMode(QAbstractItemView::NoSelection);
 
 #ifdef QT_NO_DEBUG
   ui->recipesView->hideColumn(0);
