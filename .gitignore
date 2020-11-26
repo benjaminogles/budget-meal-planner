@@ -4,4 +4,4 @@ moc_*
 *.pro.user
 Makefile
 .qmake.stash
-grocery-gui
+budget-meal-planner

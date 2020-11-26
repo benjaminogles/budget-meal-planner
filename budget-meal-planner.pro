@@ -1,5 +1,5 @@
 
-TARGET = grocery-gui
+TARGET = budget-meal-planner
 
 CONFIG += c++14
 

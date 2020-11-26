@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Groceries</string>
+   <string>Budget Meal Planner</string>
   </property>
   <widget class="QWidget" name="top">
    <layout class="QVBoxLayout" name="verticalLayout">
